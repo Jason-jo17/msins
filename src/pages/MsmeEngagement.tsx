@@ -6,6 +6,11 @@ import { FilterBar } from "@/components/dashboard/FilterBar";
 import { DetailDrawer } from "@/components/dashboard/DetailDrawer";
 import { useState } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
+import { 
+  regionData as SHARED_REGIONS, 
+  sectorData as SHARED_SECTORS, 
+  platformKpis 
+} from "@/data/ceo-regional-intelligence";
 
 const trendData = [
   { month: "Jul", posted: 320, solved: 210 }, { month: "Aug", posted: 380, solved: 245 },
@@ -15,16 +20,9 @@ const trendData = [
   { month: "Mar", posted: 470, solved: 410 },
 ];
 
-const sectorData = [
-  { sector: "Mfg", count: 1420 }, { sector: "Services", count: 980 },
-  { sector: "Agri", count: 640 }, { sector: "IT", count: 420 }, { sector: "Textile", count: 310 },
-];
-
-const regionData = [
-  { region: "Pune", count: 1240 }, { region: "Konkan", count: 980 },
-  { region: "Nashik", count: 640 }, { region: "Nagpur", count: 480 },
-  { region: "Aurangabad", count: 540 }, { region: "Amravati", count: 400 },
-];
+/** Mapped for Recharts compatibility with existing UI */
+const sectorData = SHARED_SECTORS.map(s => ({ sector: s.label, count: s.teams + s.startups }));
+const regionData = SHARED_REGIONS.map(r => ({ region: r.label, count: r.msmes }));
 
 const msmeList = [
   { name: "Precision Auto Parts Ltd", sector: "Manufacturing", region: "Pune", posted: 12, active: 3, solved: 8, satisfaction: 4.2, status: "Active" },
@@ -53,9 +51,9 @@ const MsmeEngagement = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <StatCard label="MSMEs Onboarded" value="24,860" trend={{ value: "6.4%", positive: true }} />
-          <StatCard label="Problems Posted" value="4,280" trend={{ value: "3.1%", positive: true }} />
-          <StatCard label="Problems Solved" value="2,840" trend={{ value: "8.2%", positive: true }} subtitle="66.4% resolution" />
+          <StatCard label="Active MSME Partners" value={platformKpis.msmesBenefited.toLocaleString()} trend={{ value: "6.4%", positive: true }} subtitle="Across 8 regions" />
+          <StatCard label="Problems Solved" value={platformKpis.msmesBenefited.toLocaleString()} trend={{ value: "8.2%", positive: true }} subtitle="66.4% resolution" />
+          <StatCard label="Active Innovation" value={platformKpis.activeInnovationProjects.toLocaleString()} trend={{ value: "3.1%", positive: true }} />
           <StatCard label="Avg Response Time" value="4.2d" trend={{ value: "0.8d", positive: true }} subtitle="Improved from 5.0d" />
           <StatCard label="Satisfaction Score" value="3.9/5" trend={{ value: "0.2", positive: true }} />
         </div>

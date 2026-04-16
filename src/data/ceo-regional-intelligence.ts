@@ -83,14 +83,7 @@ export const regionData: RegionIntelligence[] = [
   { key: "amravati", slug: "amravati", label: "Amravati", fundsCr: 4, startups: 13, jobs: 280, msmes: 97, roiX: 2.4, risk: "High" },
 ];
 
-export const pyramidLayers: { key: PyramidLayerKey; title: string; subtitle: string }[] = [
-  { key: "talent", title: "Talent Pool", subtitle: "18,400 students / applicants" },
-  { key: "teams", title: "Teams Formed", subtitle: "4,200 teams" },
-  { key: "projects", title: "Projects Built", subtitle: "1,280 projects" },
-  { key: "pilots", title: "Pilots Running", subtitle: "486 pilots" },
-  { key: "startups", title: "Startups Registered", subtitle: "248 startups" },
-  { key: "impact", title: "Ecosystem Impact", subtitle: "4,820 jobs · 1,140 MSMEs · ₹286 Cr impact" },
-];
+
 
 export const sectorData: SectorIntelligence[] = [
   { key: "ev", slug: "ev", label: "EV", teams: 24, startups: 11, msmeDemand: "Battery cooling, retrofits", growthPct: 22, opportunityCr: 42 },
@@ -211,13 +204,15 @@ export const platformPipeline = {
  * Value split sums to totalValueGeneratedCr; overall multiple is total / public investment.
  */
 export const platformEconomicRoi = {
-  publicInvestmentCr: 91.2,
-  totalValueGeneratedCr: 96,
+  /** Sum of regional investment (84 Cr). */
+  publicInvestmentCr: 84,
+  /** Overall impact derived from 3.4x multiplier (standardized to 286 Cr). */
+  totalValueGeneratedCr: 286,
   breakdown: [
-    { label: "Startup Revenue", valueCr: 42, pct: 44 },
-    { label: "MSME Savings", valueCr: 24, pct: 25 },
-    { label: "Jobs Value", valueCr: 18, pct: 19 },
-    { label: "Follow-on Investment", valueCr: 12, pct: 13 },
+    { label: "Startup Revenue", valueCr: 126, pct: 44 },
+    { label: "MSME Savings", valueCr: 72, pct: 25 },
+    { label: "Jobs Value", valueCr: 54, pct: 19 },
+    { label: "Follow-on Investment", valueCr: 34, pct: 12 },
   ],
 } as const;
 
@@ -227,13 +222,13 @@ export function platformEconomicRoiOverallMultiple() {
 }
 
 export const platformKpis = {
-  fundsDeployedCr: 84,
+  fundsDeployedCr: platformEconomicRoi.publicInvestmentCr,
   startupsRegistered: 248,
   jobsCreated: 4820,
   msmesBenefited: 1140,
   studentsMobilized: platformPipeline.talentPool,
   activeInnovationProjects: platformPipeline.activeInnovationProjects,
-  /** Aligned with `platformEconomicRoi` (value generated ÷ public investment), one decimal. */
+  /** Aligned with `platformEconomicRoi` (value generated ÷ public investment), or sum of regions. */
   roiIndex: platformEconomicRoiOverallMultiple(),
 } as const;
 
@@ -248,3 +243,12 @@ export function platformEconomicRoiUnitCosts() {
 export function regionBySlug(slug?: string) {
   return regionData.find((x) => x.slug === slug);
 }
+
+export const pyramidLayers: { key: PyramidLayerKey; title: string; subtitle: string }[] = [
+  { key: "talent", title: "Talent Pool", subtitle: `${platformPipeline.talentPool.toLocaleString()} students / applicants` },
+  { key: "teams", title: "Teams Formed", subtitle: `${platformPipeline.teamsFormed.toLocaleString()} teams` },
+  { key: "projects", title: "Projects Built", subtitle: `${platformPipeline.projectsInCohorts.toLocaleString()} projects` },
+  { key: "pilots", title: "Pilots Running", subtitle: `${platformPipeline.msmePilots.toLocaleString()} pilots` },
+  { key: "startups", title: "Startups Registered", subtitle: `${platformKpis.startupsRegistered.toLocaleString()} startups` },
+  { key: "impact", title: "Ecosystem Impact", subtitle: `${platformKpis.jobsCreated.toLocaleString()} jobs · ${platformKpis.msmesBenefited.toLocaleString()} MSMEs · ₹${platformEconomicRoi.totalValueGeneratedCr} Cr impact` },
+];

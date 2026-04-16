@@ -111,6 +111,17 @@ export const msmePriorityActions: MsmePriorityAction[] = [
 
 export const msmeActiveChallengeCards: MsmeChallengeCard[] = [
   {
+    "id": "ch-navitas-lighting-drone",
+    "title": "Intelligent Modular Drone Lighting",
+    "company": "Navitas Lighting",
+    "location": "Nagpur",
+    "status": "In Progress",
+    "applicants": 6,
+    "savingsPotential": "₹36L/year",
+    "eta": "12 days",
+    "bestMatch": "KIRAN · Lead Systems (Matched)"
+  },
+  {
     id: "ch-1",
     title: "Reduce Packaging Waste",
     company: "Precision Auto Components Pvt Ltd",
@@ -122,16 +133,6 @@ export const msmeActiveChallengeCards: MsmeChallengeCard[] = [
     bestMatch: "COP Solver Team (92%)",
   },
   {
-    id: "ch-2",
-    title: "Smart Irrigation Device",
-    company: "Sahyadri Agro Processing Pvt Ltd",
-    location: "Nashik",
-    status: "In Progress",
-    applicants: 6,
-    savingsPotential: "₹14L/year",
-    eta: "21 days",
-  },
-  {
     id: "ch-3",
     title: "Fabric Defect Detection",
     company: "Marathwada Textiles Pvt Ltd",
@@ -139,15 +140,6 @@ export const msmeActiveChallengeCards: MsmeChallengeCard[] = [
     status: "Open",
     applicants: 8,
     savingsPotential: "₹10L/year",
-  },
-  {
-    id: "ch-4",
-    title: "Energy Monitoring System",
-    company: "Vidarbha Industrial Systems",
-    location: "Nagpur",
-    status: "Delayed",
-    applicants: 5,
-    savingsPotential: "₹18L/year",
   },
 ];
 
@@ -179,12 +171,12 @@ export const msmeRecommendedTeams: MsmeRecommendedTeamCard[] = [
 
 export const msmeImpactCards: MsmeImpactCard[] = [
   {
-    id: "im-1",
-    title: "Smart Irrigation Device",
-    metricLabel: "Water reduced",
-    metricValue: "24%",
-    savingsLabel: "Annual savings",
-    savingsValue: "₹6L",
+    id: "im-drone-lighting",
+    title: "Intelligent Drone Lighting",
+    metricLabel: "Search coverage gain",
+    metricValue: "40%",
+    savingsLabel: "Opportunity value",
+    savingsValue: "₹36L",
     progressPct: 72,
   },
   {
