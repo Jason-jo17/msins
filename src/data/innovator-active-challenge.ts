@@ -160,10 +160,10 @@ export const innovatorActiveChallenge = {
       status: "Approved" as const,
       pdfUrl: "/Azhar - Nagpur NEXT - MSME Presentation Template.pptx.pdf",
       previewThumbUrls: [
-        "/src/assets/slides/slide_1.png",
-        "/src/assets/slides/slide_2.png",
-        "/src/assets/slides/slide_3.png",
-        "/src/assets/slides/slide_4.png"
+        "/slide_1.png",
+        "/slide_2.png",
+        "/slide_3.png",
+        "/slide_4.png"
       ] as const,
     },
     header: {
