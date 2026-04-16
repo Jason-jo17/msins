@@ -890,9 +890,16 @@ export default function InnovatorMarketplacePage() {
                                         T{i}
                                       </div>
                                       <div>
-                                        <div className="font-medium text-foreground">Stealth Startup {String.fromCharCode(64 + i)}</div>
+                                        <div className="font-medium text-foreground">
+                                          {selected.challenge.title === "SAR Drone Lighting Systems" && i === 1 
+                                            ? "KIRAN" 
+                                            : `Stealth Startup ${String.fromCharCode(64 + i)}`}
+                                        </div>
                                         <div className="text-[10px] text-muted-foreground flex gap-1 items-center">
-                                          <MapPin className="h-3 w-3" /> Pune, MH
+                                          <MapPin className="h-3 w-3" /> 
+                                          {selected.challenge.title === "SAR Drone Lighting Systems" && i === 1 
+                                            ? "Nagpur NEXT · Lead Systems" 
+                                            : "Pune, MH"}
                                         </div>
                                       </div>
                                     </div>
