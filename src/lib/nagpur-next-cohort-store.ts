@@ -7,6 +7,10 @@ import {
   NAGPUR_NEXT_TASK_ID_ORDER,
   getSprintOrderIndex,
   type NagpurProgramPhaseTemplate,
+  type NagpurProgramSprintTemplate,
+  type NagpurProgramTaskTemplate,
+  type NagpurProgramResource,
+  type NagpurProgramSme,
 } from "@/data/nagpur-next-program-config";
 import { innovatorActiveChallenge } from "@/data/innovator-active-challenge";
 import type {
@@ -79,6 +83,8 @@ export interface NagpurCohortStoreState {
   version: 1;
   programId: typeof NAGPUR_NEXT_PROGRAM_ID;
   cycleLabel: string;
+  /** Dynamic program structure */
+  programFramework: NagpurProgramPhaseTemplate[];
   /** TRL / CRL / IRL — innovator UI reads same numbers */
   levels: { trl: number; crl: number; irl: number };
   taskState: Record<string, TaskRuntime>;
@@ -87,6 +93,7 @@ export interface NagpurCohortStoreState {
   teamsMeta: Record<string, { atRisk: boolean; riskReason?: string }>;
   avgMentorResponseHours: number;
   demoReadinessPct: number;
+  activeProjectId: string;
 }
 
 type Listener = () => void;
@@ -97,10 +104,10 @@ function defaultMentorForTask(taskIndex: number): string {
   return taskIndex % 2 === 0 ? M_MSME : M_COHORT;
 }
 
-function buildDefaultTaskState(): Record<string, TaskRuntime> {
+function buildDefaultTaskState(framework: NagpurProgramPhaseTemplate[]): Record<string, TaskRuntime> {
   const map: Record<string, TaskRuntime> = {};
   let idx = 0;
-  for (const ph of NAGPUR_NEXT_PHASES) {
+  for (const ph of framework) {
     for (const sp of ph.sprints) {
       for (const t of sp.tasks) {
         map[t.id] = {
@@ -121,7 +128,8 @@ function buildDefaultTaskState(): Record<string, TaskRuntime> {
 
 /** Demo seed aligned with Kiran / Navitas / Nagpur NEXT narrative */
 function initialState(): NagpurCohortStoreState {
-  const taskState = buildDefaultTaskState();
+  const programFramework = JSON.parse(JSON.stringify(NAGPUR_NEXT_PHASES));
+  const taskState = buildDefaultTaskState(programFramework);
   const done = (id: string, due: string, mentor?: string, evidenceTitle?: string) => {
     taskState[id] = {
       ...taskState[id],
@@ -264,6 +272,7 @@ function initialState(): NagpurCohortStoreState {
     version: 1,
     programId: NAGPUR_NEXT_PROGRAM_ID,
     cycleLabel: NAGPUR_NEXT_CYCLE_LABEL,
+    programFramework,
     levels: { ...innovatorActiveChallenge.levels },
     taskState,
     activity,
@@ -275,6 +284,7 @@ function initialState(): NagpurCohortStoreState {
     },
     avgMentorResponseHours: 6.5,
     demoReadinessPct: 61,
+    activeProjectId: "project-drone",
   };
 }
 
@@ -338,7 +348,7 @@ function isTerminal(s: NagpurCohortTaskStatus): boolean {
 }
 
 function sprintComplete(sprintId: string): boolean {
-  const sprint = NAGPUR_NEXT_PHASES.flatMap((p) => p.sprints).find((s) => s.id === sprintId);
+  const sprint = state.programFramework.flatMap((p) => p.sprints).find((s) => s.id === sprintId);
   if (!sprint) return false;
   return sprint.tasks.every((t) => {
     const st = state.taskState[t.id]?.status ?? "not_started";
@@ -349,7 +359,7 @@ function sprintComplete(sprintId: string): boolean {
 function sprintGloballyLocked(sprintId: string): boolean {
   const ord = getSprintOrderIndex(sprintId);
   if (ord <= 0) return false;
-  const flat = NAGPUR_NEXT_PHASES.flatMap((p) => p.sprints);
+  const flat = state.programFramework.flatMap((p) => p.sprints);
   const prev = flat[ord - 1];
   return !sprintComplete(prev.id);
 }
@@ -366,6 +376,8 @@ function mergeSprint(phase: NagpurProgramPhaseTemplate, sprint: NagpurProgramSpr
     defaultOpen: !locked && (sprint.id === "nn-s6" || sprint.id === "nn-s5"),
     evidenceNote: sprint.evidenceNote,
     tasks: sprint.tasks.map((t) => toInnovatorTask(phase, sprint, t.id)),
+    resources: sprint.resources,
+    smeData: sprint.smeData,
   };
 }
 
@@ -375,7 +387,7 @@ function toInnovatorTask(
   taskId: string,
 ): InnovatorSprintTask {
   const tmpl = sprint.tasks.find((x) => x.id === taskId)!;
-  const rt = state.taskState[taskId] ?? buildDefaultTaskState()[taskId];
+  const rt = state.taskState[taskId] ?? buildDefaultTaskState(state.programFramework)[taskId];
   const sequentialLock = sprintGloballyLocked(sprint.id);
   let status: InnovatorTaskStatus = rt.status;
   if (sequentialLock) status = "locked";
@@ -406,11 +418,13 @@ function toInnovatorTask(
     mentorComments: rt.mentorComments,
     score,
     evidence: rt.evidence,
+    resources: tmpl.resources,
+    smeData: tmpl.smeData,
   };
 }
 
 export function getNagpurNextExecutionPhasesForInnovator(): InnovatorExecutionPhase[] {
-  return NAGPUR_NEXT_PHASES.map((phase) => ({
+  return state.programFramework.map((phase) => ({
     id: phase.id,
     index: phase.index,
     title: phase.title,
@@ -441,6 +455,18 @@ export function getNagpurNextSprintHeaderSnapshot() {
   } as const;
 }
 
+/** Set active project ID for innovator context */
+export function nagpurNextSetActiveProject(projectId: string) {
+  state.activeProjectId = projectId;
+  emit();
+}
+
+/** Get active project context from innovator challenge */
+export function getNagpurNextActiveProject() {
+  const pId = state.activeProjectId || "project-drone";
+  return innovatorActiveChallenge.projects.find((p) => p.id === pId) || innovatorActiveChallenge.projects[0];
+}
+
 export function getNagpurNextProjectSnapshot() {
   const pct = computeOverallProgressPct();
   return {
@@ -457,16 +483,18 @@ export function getNagpurNextProjectSnapshot() {
 
 function computeOverallProgressPct(): number {
   let sum = 0;
-  for (const id of NAGPUR_NEXT_TASK_ID_ORDER) {
+  const taskIds = state.programFramework.flatMap(p => p.sprints).flatMap(s => s.tasks).map(t => t.id);
+  for (const id of taskIds) {
     const s = state.taskState[id]?.status ?? "not_started";
     sum += taskWeight(s);
   }
-  return Math.min(100, Math.round((sum / NAGPUR_NEXT_TASK_ID_ORDER.length) * 100));
+  if (taskIds.length === 0) return 0;
+  return Math.min(100, Math.round((sum / taskIds.length) * 100));
 }
 
 export function getNagpurNextLaneProgress() {
   return NAGPUR_NEXT_EXECUTION_LANES.map((lane) => {
-    const taskIds = NAGPUR_NEXT_PHASES.flatMap((p) =>
+    const taskIds = state.programFramework.flatMap((p) =>
       p.sprints.filter((s) => (lane.sprintIds as readonly string[]).includes(s.id)).flatMap((s) => s.tasks.map((t) => t.id)),
     );
     const pct =
@@ -565,8 +593,9 @@ export function getNagpurNextTeamDetail(teamId: string) {
     };
   }
 
-  const tasksPreview = NAGPUR_NEXT_TASK_ID_ORDER.map((id) => {
-    const tmpl = NAGPUR_NEXT_PHASES.flatMap((p) => p.sprints).flatMap((s) => s.tasks).find((t) => t.id === id)!;
+  const taskIds = state.programFramework.flatMap(p => p.sprints).flatMap(s => s.tasks).map(t => t.id);
+  const tasksPreview = taskIds.map((id) => {
+    const tmpl = state.programFramework.flatMap((p) => p.sprints).flatMap((s) => s.tasks).find((t) => t.id === id)!;
     return { id, name: tmpl.name, status: state.taskState[id]?.status ?? "not_started" };
   });
 
@@ -709,4 +738,169 @@ export function nagpurNextRecordInnovatorSubmission(taskId: string, fileName: st
     atLabel: "Just now",
     teamId: NAGPUR_NEXT_INNOVATOR_TEAM_ID,
   });
+}
+
+// PROGRAM MANAGEMENT ACTIONS
+
+export function nagpurNextUpdateSprint(sprintId: string, patch: Partial<NagpurProgramSprintTemplate>) {
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => s.id === sprintId ? { ...s, ...patch } : s)
+    }))
+  };
+  emit();
+}
+
+export function nagpurNextAddSprintResource(sprintId: string, resource: Omit<NagpurProgramResource, "id">) {
+  const id = `res-${Date.now()}`;
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => s.id === sprintId ? { ...s, resources: [...(s.resources || []), { ...resource, id } as NagpurProgramResource] } : s)
+    }))
+  };
+  emit();
+}
+
+export function nagpurNextRemoveSprintResource(sprintId: string, resourceId: string) {
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => s.id === sprintId ? { ...s, resources: (s.resources || []).filter(r => r.id !== resourceId) } : s)
+    }))
+  };
+  emit();
+}
+
+export function nagpurNextAddTaskTemplate(sprintId: string, task: Omit<NagpurProgramTaskTemplate, "id">) {
+  const id = `task-new-${Date.now()}`;
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => {
+        if (s.id !== sprintId) return s;
+        return { ...s, tasks: [...s.tasks, { ...task, id } as NagpurProgramTaskTemplate] };
+      })
+    })),
+    taskState: {
+      ...state.taskState,
+      [id]: {
+        status: "not_started",
+        dueDate: "Jun 2026",
+        mentor: M_MSME,
+        mentorComments: [],
+        submitted: false,
+        evidence: [],
+        taskLocked: false,
+      }
+    }
+  };
+  emit();
+}
+
+export function nagpurNextDeleteTaskTemplate(sprintId: string, taskId: string) {
+  const newTaskState = { ...state.taskState };
+  delete newTaskState[taskId];
+
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => {
+        if (s.id !== sprintId) return s;
+        return { ...s, tasks: s.tasks.filter(t => t.id !== taskId) };
+      })
+    })),
+    taskState: newTaskState
+  };
+  emit();
+}
+
+export function nagpurNextUpdateTaskTemplate(sprintId: string, taskId: string, updates: Partial<NagpurProgramTaskTemplate>) {
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => {
+        if (s.id !== sprintId) return s;
+        return {
+          ...s,
+          tasks: s.tasks.map(t => t.id === taskId ? { ...t, ...updates } : t)
+        };
+      })
+    }))
+  };
+  emit();
+}
+
+export function nagpurNextUpdateSmeSection(sprintId: string, smeData: NagpurProgramSme[]) {
+  nagpurNextUpdateSprint(sprintId, { smeData });
+}
+
+export function nagpurNextAddTaskResource(sprintId: string, taskId: string, resource: NagpurProgramResource) {
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => {
+        if (s.id !== sprintId) return s;
+        return {
+          ...s,
+          tasks: s.tasks.map(t => {
+            if (t.id !== taskId) return t;
+            return {
+              ...t,
+              resources: [...(t.resources || []), resource]
+            };
+          })
+        };
+      })
+    }))
+  };
+  emit();
+}
+
+export function nagpurNextRemoveTaskResource(sprintId: string, taskId: string, resourceId: string) {
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => {
+        if (s.id !== sprintId) return s;
+        return {
+          ...s,
+          tasks: s.tasks.map(t => {
+            if (t.id !== taskId) return t;
+            return {
+              ...t,
+              resources: (t.resources || []).filter(r => r.id !== resourceId)
+            };
+          })
+        };
+      })
+    }))
+  };
+  emit();
+}
+
+export function nagpurNextUpdateTaskSmeSection(sprintId: string, taskId: string, smeData: NagpurProgramSme[]) {
+  state = {
+    ...state,
+    programFramework: state.programFramework.map(phase => ({
+      ...phase,
+      sprints: phase.sprints.map(s => {
+        if (s.id !== sprintId) return s;
+        return {
+          ...s,
+          tasks: s.tasks.map(t => t.id === taskId ? { ...t, smeData } : t)
+        };
+      })
+    }))
+  };
+  emit();
 }

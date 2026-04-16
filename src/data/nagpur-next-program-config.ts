@@ -14,6 +14,22 @@ export interface NagpurProgramTaskTemplate {
   name: string;
   subtitle: string;
   objective: string;
+  resources?: NagpurProgramResource[];
+  smeData?: NagpurProgramSme[];
+}
+
+export interface NagpurProgramResource {
+  id: string;
+  title: string;
+  url: string;
+  kind: "video" | "link" | "doc";
+}
+
+export interface NagpurProgramSme {
+  id: string;
+  name: string;
+  role: string;
+  contact?: string;
 }
 
 export interface NagpurProgramSprintTemplate {
@@ -21,6 +37,8 @@ export interface NagpurProgramSprintTemplate {
   name: string;
   evidenceNote: string;
   tasks: NagpurProgramTaskTemplate[];
+  resources?: NagpurProgramResource[];
+  smeData?: NagpurProgramSme[];
 }
 
 export interface NagpurProgramPhaseTemplate {
@@ -29,6 +47,44 @@ export interface NagpurProgramPhaseTemplate {
   title: string;
   sprints: NagpurProgramSprintTemplate[];
 }
+
+export const TOOL_TEMPLATES: Omit<NagpurProgramTaskTemplate, "id">[] = [
+  {
+    name: "5W1H Analysis",
+    subtitle: "Who, What, Where, When, Why, How",
+    objective: "Deconstruct the problem by asking six fundamental questions to gain a 360-degree view of the challenge.",
+  },
+  {
+    name: "Mind Map",
+    subtitle: "Visual brainstorming",
+    objective: "Map out the ecosystem, stakeholders, and related issues around the central challenge to find hidden connections.",
+  },
+  {
+    name: "ERRC Grid",
+    subtitle: "Eliminate, Reduce, Raise, Create",
+    objective: "Apply Blue Ocean strategy by deciding which factors to drop or enhance to create unique value for the MSME.",
+  },
+  {
+    name: "SCAMPER",
+    subtitle: "Creative thinking hack",
+    objective: "Iterate on existing solutions by Substituting, Combining, Adapting, Modifying, Putting to another use, Eliminating, and Reversing.",
+  },
+  {
+    name: "PESTEL Analysis",
+    subtitle: "Macro-environmental factor scan",
+    objective: "Analyze Political, Economic, Social, Technological, Environmental, and Legal factors impacting the solution's viability.",
+  },
+  {
+    name: "Feasibility Matrix",
+    subtitle: "Impact vs. Difficulty scoring",
+    objective: "Plot concepts on a 2x2 matrix to prioritize ideas that offer high impact with manageable implementation effort.",
+  },
+  {
+    name: "Problem Reframing (HMW)",
+    subtitle: "How Might We statements",
+    objective: "Transform observed pain points into actionable innovation opportunities using speculative 'How Might We' questions.",
+  }
+];
 
 export const NAGPUR_NEXT_PHASES: NagpurProgramPhaseTemplate[] = [
   {

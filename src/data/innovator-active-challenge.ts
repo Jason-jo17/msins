@@ -16,6 +16,79 @@ export const innovatorActiveChallenge = {
     initials: "K",
     role: "Principal Full-Stack Innovator",
   },
+  mentor: {
+    name: "Mrs. Rashmi Kulkarni",
+    role: "Lead Engineer, Navitas Lighting",
+    expertise: "Optical Systems, Industrial Lighting",
+    contact: "rashmi.k@navitas.in",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rashmi",
+    feedbackBullets: [
+      "Strong real-world disaster use case",
+      "Improve battery runtime assumptions",
+      "Add fail-safe communication logic",
+      "Excellent modular payload concept",
+      "Ready for pilot demo",
+    ] as const,
+    timeline: [
+      { id: "mf-0", author: "Mrs. Rashmi Kulkarni", message: "Strong real-world disaster use case" },
+      { id: "mf-1", author: "Mrs. Rashmi Kulkarni", message: "Improve battery runtime assumptions" },
+      { id: "mf-2", author: "Mrs. Rashmi Kulkarni", message: "Add fail-safe communication logic" },
+      { id: "mf-3", author: "Mrs. Rashmi Kulkarni", message: "Excellent modular payload concept" },
+      { id: "mf-4", author: "Mrs. Rashmi Kulkarni", message: "Ready for pilot demo" },
+    ] as const,
+  },
+  projects: [
+    {
+      id: "project-drone",
+      title: "SAR Drone Lighting Systems",
+      projectName: "Intelligent Modular Drone System",
+      linkedAcademicContext: "Nagpur NEXT Innovation Program",
+      college: "VNIT Nagpur",
+      branch: "Electronics & Communication Engineering",
+      courseName: "B.Tech Final Year",
+      cos: [
+        "CO1: Design of Multi-UAV coordination protocols under mesh latency",
+        "CO2: Configuration of high-intensity LED payloads for aerial optics",
+        "CO3: Implementation of fail-safe communication logic for disaster zones"
+      ],
+      assignedMsme: "Navitas Lighting",
+      progress: 85,
+      isLive: true,
+      icon: "Zap",
+      mentor: {
+        name: "Mrs. Rashmi Kulkarni",
+        role: "Lead Engineer, Navitas Lighting",
+        expertise: "Optical Systems, Industrial Lighting",
+        contact: "rashmi.k@navitas.in",
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rashmi",
+      }
+    },
+    {
+      id: "project-ece",
+      title: "VibrationSense AI",
+      projectName: "VibrationSense AI - Industrial Maintenance",
+      linkedAcademicContext: "ECE Major Project · Nagpur University",
+      college: "G.H. Raisoni College of Engineering, Nagpur",
+      branch: "Electronics Engineering",
+      courseName: "B.E. Major Project",
+      cos: [
+        "CO4: Real-time vibration signal processing using tensor-flow edge",
+        "CO5: Optimization of predictive maintenance algorithms for industrial motors",
+        "CO6: Integration of cloud-based health monitoring dashboards"
+      ],
+      assignedMsme: "TATA Motors (Industrial)",
+      progress: 100,
+      isLive: false,
+      icon: "Activity",
+      mentor: {
+        name: "Dr. Anil Deshmukh",
+        role: "Professor, ECE Department",
+        expertise: "Digital Signal Processing, Machine Learning",
+        contact: "a.deshmukh@vnit.ac.in",
+        avatar: "https://api.dicebear.com/7.x/pixel-art/svg?seed=Anil",
+      }
+    }
+  ],
   portfolioProjects: [
     {
       id: "project-drone",
@@ -140,23 +213,6 @@ export const innovatorActiveChallenge = {
     "Leadership",
     "Field testing",
   ] as const,
-  mentor: {
-    primaryName: "Mrs. Rashmi Kulkarni",
-    feedbackBullets: [
-      "Strong real-world disaster use case",
-      "Improve battery runtime assumptions",
-      "Add fail-safe communication logic",
-      "Excellent modular payload concept",
-      "Ready for pilot demo",
-    ] as const,
-    timeline: [
-      { id: "mf-0", author: "Mrs. Rashmi Kulkarni", message: "Strong real-world disaster use case" },
-      { id: "mf-1", author: "Mrs. Rashmi Kulkarni", message: "Improve battery runtime assumptions" },
-      { id: "mf-2", author: "Mrs. Rashmi Kulkarni", message: "Add fail-safe communication logic" },
-      { id: "mf-3", author: "Mrs. Rashmi Kulkarni", message: "Excellent modular payload concept" },
-      { id: "mf-4", author: "Mrs. Rashmi Kulkarni", message: "Ready for pilot demo" },
-    ] as const,
-  },
   deliverableVault: [
     { id: "d1", fileName: "MSME_Context.pdf", url: PDF, kind: "pdf" as const },
     { id: "d2", fileName: "Product_Requirements.pdf", url: PDF, kind: "pdf" as const },
@@ -240,6 +296,8 @@ export type InnovatorSprintTask = {
   mentorComments?: string[];
   score?: string;
   evidence?: InnovatorEvidenceItem[];
+  resources?: import("./nagpur-next-program-config").NagpurProgramResource[];
+  smeData?: import("./nagpur-next-program-config").NagpurProgramSme[];
 };
 
 export type InnovatorSprint = {
@@ -250,6 +308,8 @@ export type InnovatorSprint = {
   defaultOpen: boolean;
   evidenceNote?: string;
   tasks: InnovatorSprintTask[];
+  resources?: import("./nagpur-next-program-config").NagpurProgramResource[];
+  smeData?: import("./nagpur-next-program-config").NagpurProgramSme[];
 };
 
 export type InnovatorExecutionPhase = {

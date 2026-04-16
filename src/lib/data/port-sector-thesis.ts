@@ -89,7 +89,7 @@ export const PORT_SECTOR_THESIS: DetailedSectorThesis = {
     },
     {
       name: "MRPL Petchem Expansion",
-      type": "demand_side",
+      type: "demand_side",
       impact_level: "high",
       description: "Increased demand for specialized chemical logistics.",
       estimated_impact_percentage: 40

@@ -248,6 +248,11 @@ export default function MsmeDashboard() {
       <MsmeNewChallengeWizard
         open={wizardOpen}
         onOpenChange={setWizardOpen}
+        onSaveDraft={() => toast.success("Draft Saved", { description: "Your challenge draft is now available in your registry." })}
+        onSubmitVerification={(payload) => {
+          toast.success("Challenge Submitted", { description: "InUnity and MSME teams will review your requirements." });
+          setWizardOpen(false);
+        }}
       />
     </div>
   );

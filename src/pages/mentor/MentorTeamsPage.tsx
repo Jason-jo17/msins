@@ -17,6 +17,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import {
   mentorCohortWatchlist,
   mentorMsmeWatchlist,
   mentorReviewQueue,
@@ -35,14 +45,14 @@ function riskBadge(r: "Low" | "Medium" | "High") {
 }
 
 function workspaceHref(row: MentorTeamRow) {
-  if (row.teamName.includes("VNIT")) return "/innovator/sprint?project=ev";
-  if (row.teamName.includes("COEP")) return "/innovator/sprint?from=dashboard";
-  return "/msme/applicants";
+  return "https://sip-lite-staging.web.app/projects";
 }
 
 export default function MentorTeamsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const sprintStore = useInnovatorSprintStore();
+  const [feedbackTeam, setFeedbackTeam] = useState<MentorTeamRow | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
 
   const tab = (TAB_VALUES as readonly string[]).includes(searchParams.get("tab") ?? "")
     ? (searchParams.get("tab") as MentorTeamTab)
@@ -130,10 +140,10 @@ export default function MentorTeamsPage() {
                         <TableCell className="text-xs font-mono text-muted-foreground">{row.lastActive}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex flex-wrap justify-end gap-1">
-                            <Button size="sm" variant="secondary" className="h-8 text-[10px] px-2" asChild>
-                              <Link to={workspaceHref(row)}>Open Workspace</Link>
+                             <Button size="sm" variant="secondary" className="h-8 text-[10px] px-2" asChild>
+                              <a href={workspaceHref(row)} target="_blank" rel="noreferrer">Open Workspace</a>
                             </Button>
-                            <Button size="sm" variant="outline" className="h-8 text-[10px] px-2" onClick={() => toast.success("Feedback sent (demo)")}>
+                            <Button size="sm" variant="outline" className="h-8 text-[10px] px-2" onClick={() => setFeedbackTeam(row)}>
                               Send Feedback
                             </Button>
                             <Button size="sm" className="h-8 text-[10px] px-2" asChild>
@@ -245,6 +255,43 @@ export default function MentorTeamsPage() {
           </div>
         </TabsContent>
       </Tabs>
+      <Dialog open={!!feedbackTeam} onOpenChange={(o) => !o && setFeedbackTeam(null)}>
+        <DialogContent className="max-w-md rounded-2xl">
+          {feedbackTeam && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Send Feedback to {feedbackTeam.teamName}</DialogTitle>
+                <DialogDescription>
+                  Your feedback will be shared with the team leads and tracked in their sprint board.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <Textarea 
+                  placeholder="Type your feedback here..." 
+                  className="min-h-[120px] rounded-xl border-border/50 focus:border-primary/50"
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                />
+              </div>
+              <DialogFooter className="gap-2 sm:justify-between">
+                <Button variant="ghost" className="rounded-xl" onClick={() => setFeedbackTeam(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  className="rounded-xl bg-primary hover:bg-primary/90"
+                  onClick={() => {
+                    toast.success("Feedback shared", { description: `Message sent to ${feedbackTeam.teamName}` });
+                    setFeedbackTeam(null);
+                    setFeedbackText("");
+                  }}
+                >
+                  Send Feedback
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

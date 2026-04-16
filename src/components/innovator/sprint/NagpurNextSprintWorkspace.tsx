@@ -6,25 +6,43 @@ import {
   Calendar,
   CheckCircle2,
   ChevronDown,
+  ExternalLink,
   FileText,
   Home,
   Layers,
   LayoutList,
+  Link as LinkIcon,
   Lock,
   MessageSquare,
   Paperclip,
+  ShieldCheck,
   Sparkles,
   Target,
   Upload,
   User,
+  Video,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +57,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
+  getNagpurNextActiveProject,
   getNagpurNextExecutionPhasesForInnovator,
   getNagpurNextSprintHeaderSnapshot,
   innovatorActiveChallenge,
@@ -50,6 +69,7 @@ import {
   nagpurNextMentorFeedbackBullets,
   nagpurNextMilestones,
   nagpurNextRecordInnovatorSubmission,
+  nagpurNextSetActiveProject,
   nagpurNextSpecification,
   nagpurNextSprintChallengeBrief,
   nagpurNextSprintInnovatorProblemId,
@@ -120,6 +140,9 @@ export default function NagpurNextSprintWorkspace() {
     setActiveTask(task);
     setTaskSheetOpen(true);
   };
+
+  const activeProject = useMemo(() => getNagpurNextActiveProject(), [cohortV]);
+  const portfolio = innovatorActiveChallenge.projects;
 
   const taskPreviewPdfUrl =
     activeTask?.evidence?.find((e) => e.kind === "pdf")?.url ?? nagpurNextIdeaSubmission.pdfUrl;
@@ -205,19 +228,103 @@ export default function NagpurNextSprintWorkspace() {
                       Back
                     </Button>
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Active sprint</p>
-                      <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground md:text-3xl">{h.projectName}</h1>
-                      <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-                        <span>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Active sprint context</p>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-4 w-4 text-muted-foreground hover:text-primary">
+                              <ChevronDown className="h-3 w-3" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-56">
+                            <DropdownMenuLabel>Switch Project</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {portfolio.map((p) => (
+                              <DropdownMenuItem 
+                                key={p.id} 
+                                className={cn("flex items-center justify-between", activeProject.id === p.id && "bg-muted font-medium")}
+                                onClick={() => nagpurNextSetActiveProject(p.id)}
+                              >
+                                {p.title}
+                                {activeProject.id === p.id && <CheckCircle2 className="h-3.5 w-3.5 text-primary" />}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      
+                      <div className="flex items-baseline gap-3">
+                        <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                          {activeProject.projectName || h.projectName}
+                        </h1>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="h-5 px-1.5 text-[9px] font-bold uppercase tracking-wider border-violet-500/30 bg-violet-500/10 text-violet-700 shadow-[0_0_8px_rgba(139,92,246,0.1)]">
+                          {activeProject.linkedAcademicContext}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground tabular-nums">
+                          {activeProject.college} · {activeProject.branch} · {activeProject.courseName}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
                           <span className="font-medium text-foreground">{h.studentName}</span>
-                          <span className="mx-1.5 text-border">·</span>
-                          {h.programName}
-                        </span>
+                          <span className="text-border">·</span>
+                          <span>{h.programName}</span>
+                        </div>
+                        
                         <span className="hidden sm:inline text-border">|</span>
-                        <span>
-                          MSME: <span className="font-medium text-foreground">{h.assignedMsme}</span>
-                        </span>
-                      </p>
+                        
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="flex items-center gap-2 transition-colors hover:text-primary group">
+                              <User className="h-3.5 w-3.5 text-primary/70 group-hover:text-primary" />
+                              <span>Mentor: <span className="font-medium text-foreground border-b border-dotted border-border group-hover:border-primary">{activeProject.mentor?.name || h.assignedMsme}</span></span>
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-72 p-0" align="start">
+                            <div className="bg-muted/30 p-4 border-b border-border">
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
+                                  <AvatarImage src={activeProject.mentor?.avatar} />
+                                  <AvatarFallback>{activeProject.mentor?.name?.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <h4 className="text-sm font-bold text-foreground">{activeProject.mentor?.name}</h4>
+                                  <p className="text-[10px] text-muted-foreground">{activeProject.mentor?.role}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="p-4 space-y-3">
+                              <div>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Expertise</p>
+                                <p className="text-xs text-foreground leading-relaxed">{activeProject.mentor?.expertise}</p>
+                              </div>
+                              <div className="flex items-center justify-between text-xs pt-2">
+                                <span className="text-muted-foreground">{activeProject.mentor?.contact}</span>
+                                <Button variant="ghost" size="sm" className="h-7 text-[10px] text-primary">Message</Button>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+
+                        <div className="flex flex-wrap items-center gap-2 ml-auto max-w-[400px] justify-end">
+                          {activeProject.cos?.map((co) => (
+                            <Tooltip key={co}>
+                              <TooltipTrigger asChild>
+                                <Badge variant="secondary" className="h-5 px-2 text-[9px] font-medium bg-primary/5 text-primary border border-primary/10 hover:bg-primary/10 transition-colors cursor-help">
+                                  {co.split(":")[0]}
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-[280px] p-2 text-[11px] leading-snug">
+                                <p className="font-bold text-primary mb-1">{co.split(":")[0]}</p>
+                                {co.split(":")[1]?.trim()}
+                              </TooltipContent>
+                            </Tooltip>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="secondary" className="border border-primary/15 bg-primary/[0.06] font-mono text-xs">
@@ -471,6 +578,68 @@ export default function NagpurNextSprintWorkspace() {
                                             </div>
                                           </button>
                                         ))}
+
+                                        {/* Sprint Resources & SMEs */}
+                                        {((sprint.resources || []).length > 0 || (sprint.smeData || []).length > 0) && (
+                                          <div className="mt-4 grid gap-4 border-t border-border/40 pt-4 sm:grid-cols-2">
+                                            {/* Resources */}
+                                            {(sprint.resources || []).length > 0 && (
+                                              <div className="space-y-3">
+                                                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                                  <Layers className="h-3.5 w-3.5" />
+                                                  Sprint Resources
+                                                </div>
+                                                <div className="space-y-2">
+                                                  {(sprint.resources || []).map((res) => (
+                                                    <a
+                                                      key={res.id}
+                                                      href={res.url}
+                                                      target="_blank"
+                                                      rel="noreferrer"
+                                                      className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/50 p-2.5 transition-all hover:border-primary/30 hover:bg-primary/[0.02] group"
+                                                    >
+                                                      {res.kind === "video" ? (
+                                                        <Video className="h-4 w-4 text-rose-500" />
+                                                      ) : (
+                                                        <LinkIcon className="h-4 w-4 text-blue-500" />
+                                                      )}
+                                                      <span className="flex-1 truncate text-xs font-semibold text-foreground group-hover:text-primary">
+                                                        {res.title}
+                                                      </span>
+                                                      <ExternalLink className="h-3 w-3 text-muted-foreground/30 group-hover:text-primary/40" />
+                                                    </a>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            )}
+
+                                            {/* SMEs */}
+                                            {(sprint.smeData || []).length > 0 && (
+                                              <div className="space-y-3">
+                                                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                                  <ShieldCheck className="h-3.5 w-3.5" />
+                                                  Assigned SMEs
+                                                </div>
+                                                <div className="space-y-2">
+                                                  {(sprint.smeData || []).map((sme) => (
+                                                    <div
+                                                      key={sme.id}
+                                                      className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/50 p-2.5"
+                                                    >
+                                                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                                                        {sme.name.charAt(0)}
+                                                      </div>
+                                                      <div className="min-w-0">
+                                                        <p className="truncate text-xs font-bold text-foreground">{sme.name}</p>
+                                                        <p className="truncate text-[10px] text-muted-foreground">{sme.role}</p>
+                                                      </div>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
                                       </div>
                                     ) : null}
                                   </CollapsibleContent>
@@ -548,7 +717,7 @@ export default function NagpurNextSprintWorkspace() {
                 <Card className="rounded-2xl border-border/80 shadow-sm">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-semibold">Mentor feedback</CardTitle>
-                    <p className="text-xs text-muted-foreground">{innovatorActiveChallenge.mentor.primaryName}</p>
+                    <p className="text-xs text-muted-foreground">{innovatorActiveChallenge.mentor.name}</p>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <ol className="list-decimal space-y-2.5 pl-4 text-sm text-muted-foreground">
@@ -563,7 +732,7 @@ export default function NagpurNextSprintWorkspace() {
                       size="sm"
                       onClick={() =>
                         toast.success("Call scheduled", {
-                          description: `${innovatorActiveChallenge.mentor.primaryName} · ${innovatorActiveChallenge.project.nextReview} (demo).`,
+                          description: `${innovatorActiveChallenge.mentor.name} · ${innovatorActiveChallenge.project.nextReview} (demo).`,
                         })
                       }
                     >
@@ -792,9 +961,62 @@ export default function NagpurNextSprintWorkspace() {
                   </Badge>
                 ) : null}
               </div>
-              <div className="rounded-lg border border-border/80 bg-secondary/20 p-3">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Objective</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-foreground">{activeTask.objective}</p>
+              <div className="space-y-4">
+                <div className="rounded-lg border border-border/80 bg-secondary/20 p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Objective</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-foreground">{activeTask.objective}</p>
+                </div>
+
+                {/* Task Resources */}
+                {(activeTask.resources || []).length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+                      <LinkIcon className="h-3 w-3" /> Tool Resources
+                    </p>
+                    <div className="grid gap-2">
+                      {activeTask.resources?.map((res) => (
+                        <a
+                          key={res.id}
+                          href={res.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="group flex items-center gap-2 rounded-lg border border-border/60 bg-background px-3 py-2 transition-all hover:bg-muted/30"
+                        >
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500/10 text-blue-600">
+                            {res.kind === "video" ? <Video className="h-3.5 w-3.5" /> : <LinkIcon className="h-3.5 w-3.5" />}
+                          </div>
+                          <span className="flex-1 truncate text-xs font-medium">{res.title}</span>
+                          <ExternalLink className="h-3 w-3 text-muted-foreground/30 group-hover:text-primary" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Task SMEs */}
+                {(activeTask.smeData || []).length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+                      <ShieldCheck className="h-3.5 w-3.5" /> Task Specialists
+                    </p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {activeTask.smeData?.map((sme) => (
+                        <div
+                          key={sme.id}
+                          className="flex items-center gap-3 rounded-lg border border-border/60 bg-violet-500/[0.03] p-2.5"
+                        >
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/10 text-[11px] font-bold text-violet-700">
+                            {sme.name.charAt(0)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-xs font-bold text-foreground">{sme.name}</p>
+                            <p className="truncate text-[10px] text-muted-foreground">{sme.role}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                 <span>

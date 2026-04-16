@@ -20,4 +20,6 @@ export {
   nagpurNextSetTeamAtRisk,
   nagpurNextToggleTaskLock,
   nagpurNextUpdateTask,
+  nagpurNextSetActiveProject,
+  getNagpurNextActiveProject,
 } from "@/lib/nagpur-next-cohort-store";

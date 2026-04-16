@@ -147,7 +147,6 @@ export interface NagpurNextChallenge extends MsmeChallengeListItem {
   expected_outcome: string;
   complexity: "Variable" | "Low" | "Medium" | "High" | "Very High";
   skills_required: string[];
-  tags?: string[];
   prd?: ChallengePRD;
   mosi_interviews?: MosiInterview[];
   reference_videos?: string[];

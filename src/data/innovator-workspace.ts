@@ -122,6 +122,20 @@ export const innovatorRecommendedProblems: InnovatorProblemCard[] = [
 export const innovatorProblemPool: InnovatorProblemCard[] = [
   ...innovatorRecommendedProblems,
   {
+    id: "inv-p-navitas-drone-fleet",
+    title: "SAR Drone Fleet Intelligence",
+    msme: "Navitas Lighting",
+    region: "Nagpur",
+    matchPct: 98,
+    why: "UAV Dev + Embedded systems + SAR focus",
+    valueLabel: "₹36 Lakhs",
+    sector: "Aerospace / Electronics",
+    summary: "Coordinate a fleet of drones equipped with intelligent inflatable LED systems for large-scale Search & Rescue missions in dark zones.",
+    problemLocation: "Multiple MIDC locations & Disaster sites",
+    businessImpact: "Strategic entry into disaster management tech; improved product reliability in critical zones.",
+    desiredOutcome: "Command hub for multi-UAV light coordination and mission telemetry."
+  },
+  {
     id: "prd-nag-001",
     title: "AI-Powered Shopfloor Workflow Optimization",
     msme: "Ashta Tech Automation",
