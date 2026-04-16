@@ -114,6 +114,110 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
         </Card>
       </div>
 
+      {/* CEED Discovery (MOSI Transcripts) */}
+      {challenge.mosi_interviews && challenge.mosi_interviews.length > 0 && (
+        <section className="space-y-6 pt-4 border-t border-border/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-amber-600">
+              <Zap className="h-5 w-5 fill-amber-600/20" />
+              <h2 className="text-lg font-bold tracking-tight uppercase">CEED: Opportunity Discovery (MOSI)</h2>
+            </div>
+            <Badge variant="outline" className="bg-amber-500/5 text-amber-600 border-amber-500/20">
+              Verified Stakeholder Voice
+            </Badge>
+          </div>
+
+          <div className="space-y-6">
+            {challenge.mosi_interviews.map((interview) => (
+              <Card key={interview.id} className="border-amber-500/10 bg-amber-500/[0.02] overflow-hidden">
+                <div className="bg-amber-500/5 p-4 border-b border-amber-500/10 flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center border border-amber-500/20">
+                      <span className="text-amber-700 font-bold">{interview.metadata.stakeholder.charAt(0)}</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-amber-900 dark:text-amber-100">{interview.metadata.stakeholder}</p>
+                      <p className="text-[11px] text-amber-700/70 font-medium">{interview.metadata.designation} @ {interview.metadata.company}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] font-bold text-amber-700/60 uppercase tracking-widest">
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="h-3 w-3" />
+                      {Math.floor(interview.duration / 60)} MINS
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <BarChart3 className="h-3 w-3" />
+                      {interview.status}
+                    </div>
+                  </div>
+                </div>
+                
+                <CardContent className="p-0">
+                  <div className="grid grid-cols-1 lg:grid-cols-12">
+                    {/* Insights Panel */}
+                    <div className="lg:col-span-4 p-6 border-r border-amber-500/10 space-y-6 bg-amber-500/[0.01]">
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-bold text-amber-700/60 uppercase tracking-widest">Discovery Summary</p>
+                        <p className="text-sm leading-relaxed">{interview.summary}</p>
+                      </div>
+
+                      <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/10">
+                        <p className="text-[10px] font-bold text-green-600 uppercase mb-1 flex items-center gap-1">
+                          <Zap className="h-3 w-3 fill-green-600" /> Potential ROI
+                        </p>
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100">{interview.potential_roi}</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <p className="text-[10px] font-bold text-amber-700/60 uppercase tracking-widest text-center py-1 border-y border-amber-500/5">Transcribed Highlights</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {interview.tech_stack_recommended.map(tech => (
+                            <Badge key={tech} variant="outline" className="bg-white/50 border-amber-500/10 text-[10px] text-amber-700">
+                              {tech}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Transcript Feed */}
+                    <div className="lg:col-span-8 h-[450px] overflow-y-auto bg-white/40 dark:bg-black/20 p-6 space-y-6 scrollbar-thin scrollbar-thumb-amber-500/20">
+                      {interview.transcript.map((msg, i) => (
+                        <div key={msg.id} className={`flex flex-col ${msg.speaker === 'Interviewer' ? 'items-start' : 'items-end'}`}>
+                          <div className={`max-w-[85%] rounded-2xl p-4 shadow-sm relative ${
+                            msg.speaker === 'Interviewer' 
+                              ? 'bg-muted border border-border rounded-tl-none' 
+                              : msg.opportunity 
+                                ? 'bg-amber-100 dark:bg-amber-900/30 border border-amber-500/30 rounded-tr-none' 
+                                : 'bg-primary/5 border border-primary/10 rounded-tr-none'
+                            }`}>
+                            <div className="flex items-center justify-between gap-4 mb-1">
+                              <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">
+                                {msg.speaker}
+                              </span>
+                              <span className="text-[9px] opacity-40 font-mono">
+                                {Math.floor(msg.timestamp / 60)}:{(msg.timestamp % 60).toString().padStart(2, '0')}
+                              </span>
+                            </div>
+                            <p className="text-sm leading-relaxed">{msg.text}</p>
+                            
+                            {msg.opportunity && (
+                              <div className="absolute -left-2 -top-2 h-6 w-6 rounded-full bg-amber-500 flex items-center justify-center shadow-lg animate-pulse">
+                                <Zap className="h-3 w-3 text-white fill-white" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Functional Requirements */}
       {prd.functional_requirements && (
         <section className="space-y-4">

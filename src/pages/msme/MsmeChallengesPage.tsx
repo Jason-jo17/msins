@@ -320,11 +320,11 @@ export default function MsmeChallengesPage() {
                   key={row.id} 
                   className={cn(
                     "group relative overflow-hidden rounded-[2rem] border-border/50 bg-card transition-all duration-500",
-                    row.id === "challenge-nag-011" 
+                    (row.id === "challenge-nag-011" || isNagpurNext)
                       ? "hover:border-primary/40 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] cursor-pointer" 
                       : "opacity-60 grayscale cursor-not-allowed border-dashed"
                   )}
-                  onClick={() => row.id === "challenge-nag-011" && openDrawer(row)}
+                  onClick={() => (row.id === "challenge-nag-011" || isNagpurNext) && openDrawer(row)}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   {row.id !== "challenge-nag-011" && (
@@ -422,11 +422,11 @@ export default function MsmeChallengesPage() {
                       key={row.id}
                       className={cn(
                         "transition-all group/row",
-                        row.id === "challenge-nag-011" 
+                        (row.id === "challenge-nag-011" || isNagpurNext)
                           ? "hover:bg-primary/[0.01] cursor-pointer" 
                           : "opacity-60 grayscale cursor-not-allowed border-dashed bg-muted/5"
                       )}
-                      onClick={() => row.id === "challenge-nag-011" && openDrawer(row)}
+                      onClick={() => (row.id === "challenge-nag-011" || isNagpurNext) && openDrawer(row)}
                     >
                       <td className="py-6 px-8">
                         <div className="flex items-center gap-4">
@@ -503,30 +503,30 @@ export default function MsmeChallengesPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl border-border/50 shadow-2xl">
                             <DropdownMenuItem 
-                              disabled={row.id !== "challenge-nag-011"}
-                              onSelect={() => row.id === "challenge-nag-011" && openDrawer(row)} 
+                              disabled={row.id !== "challenge-nag-011" && !isNagpurNext}
+                              onSelect={() => (row.id === "challenge-nag-011" || isNagpurNext) && openDrawer(row)} 
                               className="gap-3 font-bold p-3 rounded-xl cursor-pointer"
                             >
                               <FileCode2 className="h-5 w-5 text-primary" /> Access Full Specifications
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                              disabled={row.id !== "challenge-nag-011"}
-                              onSelect={() => row.id === "challenge-nag-011" && navigate("/msme/applicants")} 
+                              disabled={row.id !== "challenge-nag-011" && !isNagpurNext}
+                              onSelect={() => (row.id === "challenge-nag-011" || isNagpurNext) && navigate("/msme/applicants")} 
                               className="gap-3 font-medium p-3 rounded-xl cursor-pointer"
                             >
                               <Target className="h-5 w-5 text-muted-foreground" /> Benchmark Solvers
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="my-2" />
                             <DropdownMenuItem 
-                              disabled={row.id !== "challenge-nag-011"}
-                              onSelect={() => row.id === "challenge-nag-011" && openWizardEdit(row)} 
+                              disabled={row.id !== "challenge-nag-011" && !isNagpurNext}
+                              onSelect={() => (row.id === "challenge-nag-011" || isNagpurNext) && openWizardEdit(row)} 
                               className="gap-3 p-3 rounded-xl cursor-pointer"
                             >
                               <Settings className="h-5 w-5 text-muted-foreground" /> Modify Framework
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                              disabled={row.id !== "challenge-nag-011"}
-                              onSelect={() => row.id === "challenge-nag-011" && runPublishAction(row)} 
+                              disabled={row.id !== "challenge-nag-011" && !isNagpurNext}
+                              onSelect={() => (row.id === "challenge-nag-011" || isNagpurNext) && runPublishAction(row)} 
                               className="gap-3 p-3 rounded-xl cursor-pointer font-black text-primary"
                             >
                               <Rocket className="h-5 w-5" /> Change Pool Visibility
@@ -731,7 +731,10 @@ export default function MsmeChallengesPage() {
                     <h3 className="text-2xl font-black text-foreground tracking-tight">Innovator Pool</h3>
                     <p className="text-xs text-muted-foreground font-medium mt-1">Found {selected.applicants} qualified teams and individual solvers.</p>
                   </div>
-                  <Button className="rounded-xl h-11 px-6 font-bold text-sm shadow-xl shadow-primary/10">
+                  <Button 
+                    className="rounded-xl h-11 px-6 font-bold text-sm shadow-xl shadow-primary/10"
+                    onClick={() => navigate(`/msme/challenges/${selected?.id || 'all'}/evaluate/all`)}
+                  >
                     Review All Dossiers
                   </Button>
                 </div>
@@ -761,7 +764,13 @@ export default function MsmeChallengesPage() {
                              <p className="text-[9px] font-black text-muted-foreground uppercase opacity-60">Match</p>
                              <p className="text-sm font-black text-foreground">{92 - i}%</p>
                            </div>
-                           <Button variant="outline" className="rounded-xl h-10 px-5 font-bold text-xs flex-1 sm:flex-none">Open Evaluator</Button>
+                           <Button 
+                             variant="outline" 
+                             className="rounded-xl h-10 px-5 font-bold text-xs flex-1 sm:flex-none"
+                             onClick={() => navigate(`/msme/challenges/${selected?.id || 'all'}/evaluate/${i === 1 ? 'kiran' : 'team-' + i}`)}
+                           >
+                             Open Evaluator
+                           </Button>
                         </div>
                       </CardContent>
                     </Card>
