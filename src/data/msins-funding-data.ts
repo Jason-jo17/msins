@@ -194,3 +194,67 @@ export const FUNDING_REPORT_TEXT = {
   opacity_analysis: "The single most important finding of this research is the near-total absence of public fund utilization data. DBATU DFIIE is the only state-funded incubator to publicly disclose its tranche receipts — receiving only 15% utilization over nearly seven years.",
   policy_2025: "The Maharashtra Startup Policy 2025, approved under CM Devendra Fadnavis, targets 25,000 entrepreneurs with the ₹500 crore CM Maha-Fund. A 300-acre Maharashtra Innovation City near Navi Mumbai is envisioned.",
 };
+
+export const GOVERNANCE_METRICS = {
+   totalBudget: "₹420Cr",
+   utilized: "₹284Cr",
+   remaining: "₹136Cr",
+   utilizationPercent: "67.6%",
+   costPerStartup: "₹15.4L",
+   costPerSuccess: "₹58.4L",
+   utilTrend: { value: "4%", positive: true },
+   disbursalTrend: { value: "8%", positive: true }
+};
+
+export const MONTHLY_DISBURSAL_DATA = [
+   { month: 'Jul', value: 22 },
+   { month: 'Aug', value: 28 },
+   { month: 'Sep', value: 32 },
+   { month: 'Oct', value: 24 },
+   { month: 'Nov', value: 38 },
+   { month: 'Dec', value: 42 },
+   { month: 'Jan', value: 36 },
+   { month: 'Feb', value: 44 },
+   { month: 'Mar', value: 48 },
+];
+
+export const CENTER_UTILIZATION_CHART = [
+   { name: 'COEP', value: 92 },
+   { name: 'IIT', value: 90 },
+   { name: 'Venture', value: 93 },
+   { name: 'VNIT', value: 87 },
+   { name: 'Nashik', value: 78 },
+   { name: 'Amravati', value: 65 },
+   { name: 'Gadchiroli', value: 53 },
+];
+
+export const FUND_ALERTS_DATA = [
+   {
+      id: "a1",
+      title: "Underutilized Funds",
+      description: "Gadchiroli TBI at 53% utilization — ₹1.9Cr unused",
+      severity: "high",
+      time: "2h ago"
+   },
+   {
+      id: "a2",
+      title: "No Output Alert",
+      description: "Amravati center — ₹3.8Cr spent, only 8 graduates",
+      severity: "high",
+      time: "3h ago"
+   },
+   {
+      id: "a3",
+      title: "Overspending Risk",
+      description: "Nashik AgriTech approaching 90% budget with 60% milestones",
+      severity: "medium",
+      time: "5h ago"
+   },
+   {
+      id: "a4",
+      title: "Delayed Reporting",
+      description: "3 centers have not submitted Q4 financial reports",
+      severity: "low",
+      time: "1d ago"
+   }
+];

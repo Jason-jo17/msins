@@ -7,6 +7,7 @@ interface AlertItemProps {
   description: string;
   severity: Severity;
   time?: string;
+  className?: string;
   onClick?: () => void;
 }
 
@@ -16,11 +17,11 @@ const severityConfig = {
   low: { dot: "bg-primary", bg: "bg-primary/5 border-primary/20" },
 };
 
-export function AlertItem({ title, description, severity, time, onClick }: AlertItemProps) {
+export function AlertItem({ title, description, severity, time, className, onClick }: AlertItemProps) {
   const config = severityConfig[severity];
   return (
     <div
-      className={cn("rounded-lg border p-3 space-y-1 transition-all", config.bg, onClick && "cursor-pointer hover:shadow-md")}
+      className={cn("rounded-lg border p-3 space-y-1 transition-all", config.bg, onClick && "cursor-pointer hover:shadow-md", className)}
       onClick={onClick}
     >
       <div className="flex items-center gap-2">
