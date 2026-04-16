@@ -746,10 +746,14 @@ export default function MsmeChallengesPage() {
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                               <p className="text-base font-black text-foreground tracking-tight">Quantum Solvers #0{i}</p>
+                               <p className="text-base font-black text-foreground tracking-tight">
+                                 {selected.title === "SAR Drone Lighting Systems" && i === 1 ? "KIRAN" : `Quantum Solvers #0${i}`}
+                               </p>
                                <Badge className="bg-primary/10 text-primary border-none text-[8px] h-4.5 px-2">Top Tier</Badge>
                             </div>
-                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">VNIT Nagpur · Advanced Robotics Dept.</p>
+                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                              {selected.title === "SAR Drone Lighting Systems" && i === 1 ? "Nagpur NEXT · Lead Systems" : "VNIT Nagpur · Advanced Robotics Dept."}
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-4 w-full sm:w-auto">

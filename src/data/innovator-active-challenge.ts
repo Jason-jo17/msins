@@ -156,10 +156,15 @@ export const innovatorActiveChallenge = {
         "Target 25–40% faster coverage of priority grid cells in exercises, with a manufacturable payload module Navitas can pilot with district responders.",
     },
     ideaSubmission: {
-      fileName: "Intelligent Modular Drone System - Navitas Lighting.pdf",
+      fileName: "Azhar - Nagpur NEXT - MSME Presentation Template.pptx.pdf",
       status: "Approved" as const,
       pdfUrl: PDF,
-      previewThumbUrls: [THUMB, THUMB, THUMB, THUMB] as const,
+      previewThumbUrls: [
+        "/src/assets/slides/slide_1.png",
+        "/src/assets/slides/slide_2.png",
+        "/src/assets/slides/slide_3.png",
+        "/src/assets/slides/slide_4.png"
+      ] as const,
     },
     header: {
       stage: "Validate & build",
