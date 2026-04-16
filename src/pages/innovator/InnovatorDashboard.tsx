@@ -471,7 +471,7 @@ export default function InnovatorDashboard() {
                   <Progress value={pct} className="mt-1 h-1.5" />
                 </div>
               ))}
-              <Button className="w-full" size="sm" onClick={() => navigate("/innovator/recruit-profile")}>
+              <Button className="w-full" size="sm" onClick={() => window.open("https://inpulse-staging-recruitment.web.app", "_blank")}>
                 Open recruit profile
               </Button>
             </CardContent>

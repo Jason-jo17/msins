@@ -7,23 +7,8 @@ import {
   ChevronDown, 
   FileText, 
   MessageSquare, 
-  MoreHorizontal, 
-  Zap, 
-  ShieldCheck, 
-  Target, 
-  Award, 
-  Trophy,
-  Rocket,
-  Search,
-  Users as UsersIcon,
-  Calendar,
-  FileCode2,
-  ExternalLink,
-  Settings,
-  MapPin,
-  Clock,
-  Briefcase,
-  Presentation
+  Presentation,
+  Lock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -318,14 +303,25 @@ export default function MsmeChallengesPage() {
               return (
                 <Card 
                   key={row.id} 
-                  className="group relative overflow-hidden rounded-[2rem] border-border/50 bg-card hover:border-primary/40 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 cursor-pointer"
-                  onClick={() => openDrawer(row)}
+                  className={cn(
+                    "group relative overflow-hidden rounded-[2rem] border-border/50 bg-card transition-all duration-500",
+                    row.id === "challenge-nag-011" 
+                      ? "hover:border-primary/40 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] cursor-pointer" 
+                      : "opacity-60 grayscale cursor-not-allowed border-dashed"
+                  )}
+                  onClick={() => row.id === "challenge-nag-011" && openDrawer(row)}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {row.id !== "challenge-nag-011" && (
+                    <div className="absolute top-4 right-4 z-10 h-8 w-8 rounded-full bg-neutral-900/80 backdrop-blur-sm flex items-center justify-center border border-white/10 shadow-lg">
+                      <Lock className="h-4 w-4 text-white/40" />
+                    </div>
+                  )}
                   <CardHeader className="space-y-6 pb-2">
                     <div className="flex justify-between items-start">
                       <div className={cn(
-                        "h-12 w-12 rounded-2xl flex items-center justify-center shadow-inner transition-transform group-hover:scale-110 duration-500",
+                        "h-12 w-12 rounded-2xl flex items-center justify-center shadow-inner transition-transform duration-500",
+                        row.id === "challenge-nag-011" && "group-hover:scale-110",
                         isNagpurNext ? "bg-neutral-900 border border-primary/20" : "bg-muted/50 border border-border"
                       )}>
                         {isNagpurNext ? <Rocket className="h-6 w-6 text-primary" /> : <FileText className="h-6 w-6 text-muted-foreground" />}
@@ -336,7 +332,10 @@ export default function MsmeChallengesPage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-black text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                      <h3 className={cn(
+                        "text-xl font-black text-foreground leading-tight transition-colors line-clamp-2",
+                        row.id === "challenge-nag-011" && "group-hover:text-primary"
+                      )}>
                         {row.title}
                       </h3>
                       <p className="text-xs text-muted-foreground font-medium line-clamp-2 leading-relaxed">
@@ -367,11 +366,19 @@ export default function MsmeChallengesPage() {
                     </div>
                   </CardContent>
                   <CardFooter className="pt-2 pb-6 flex justify-between gap-3">
-                    <Button variant="ghost" className="h-10 text-[10px] font-black uppercase tracking-widest hover:bg-primary/5 hover:text-primary rounded-xl flex-1">
-                       Quick View
+                    <Button 
+                      variant="ghost" 
+                      disabled={row.id !== "challenge-nag-011"}
+                      className="h-10 text-[10px] font-black uppercase tracking-widest hover:bg-primary/5 hover:text-primary rounded-xl flex-1"
+                    >
+                       {row.id === "challenge-nag-011" ? "Quick View" : "Locked"}
                     </Button>
-                    <Button variant="outline" className="h-10 text-[10px] font-black uppercase tracking-widest border-border/50 rounded-xl flex-1 shadow-sm">
-                       Access PRD
+                    <Button 
+                      variant="outline" 
+                      disabled={row.id !== "challenge-nag-011"}
+                      className="h-10 text-[10px] font-black uppercase tracking-widest border-border/50 rounded-xl flex-1 shadow-sm"
+                    >
+                       {row.id === "challenge-nag-011" ? "Access PRD" : "Restricted"}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -398,8 +405,13 @@ export default function MsmeChallengesPage() {
                   return (
                     <tr
                       key={row.id}
-                      className="hover:bg-primary/[0.01] cursor-pointer transition-all group/row"
-                      onClick={() => openDrawer(row)}
+                      className={cn(
+                        "transition-all group/row",
+                        row.id === "challenge-nag-011" 
+                          ? "hover:bg-primary/[0.01] cursor-pointer" 
+                          : "opacity-60 grayscale cursor-not-allowed border-dashed bg-muted/5"
+                      )}
+                      onClick={() => row.id === "challenge-nag-011" && openDrawer(row)}
                     >
                       <td className="py-6 px-8">
                         <div className="flex items-center gap-4">
@@ -475,17 +487,33 @@ export default function MsmeChallengesPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl border-border/50 shadow-2xl">
-                            <DropdownMenuItem onSelect={() => openDrawer(row)} className="gap-3 font-bold p-3 rounded-xl cursor-pointer">
+                            <DropdownMenuItem 
+                              disabled={row.id !== "challenge-nag-011"}
+                              onSelect={() => row.id === "challenge-nag-011" && openDrawer(row)} 
+                              className="gap-3 font-bold p-3 rounded-xl cursor-pointer"
+                            >
                               <FileCode2 className="h-5 w-5 text-primary" /> Access Full Specifications
                             </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => navigate("/msme/applicants")} className="gap-3 font-medium p-3 rounded-xl cursor-pointer">
+                            <DropdownMenuItem 
+                              disabled={row.id !== "challenge-nag-011"}
+                              onSelect={() => row.id === "challenge-nag-011" && navigate("/msme/applicants")} 
+                              className="gap-3 font-medium p-3 rounded-xl cursor-pointer"
+                            >
                               <Target className="h-5 w-5 text-muted-foreground" /> Benchmark Solvers
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="my-2" />
-                            <DropdownMenuItem onSelect={() => openWizardEdit(row)} className="gap-3 p-3 rounded-xl cursor-pointer">
+                            <DropdownMenuItem 
+                              disabled={row.id !== "challenge-nag-011"}
+                              onSelect={() => row.id === "challenge-nag-011" && openWizardEdit(row)} 
+                              className="gap-3 p-3 rounded-xl cursor-pointer"
+                            >
                               <Settings className="h-5 w-5 text-muted-foreground" /> Modify Framework
                             </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => runPublishAction(row)} className="gap-3 p-3 rounded-xl cursor-pointer font-black text-primary">
+                            <DropdownMenuItem 
+                              disabled={row.id !== "challenge-nag-011"}
+                              onSelect={() => row.id === "challenge-nag-011" && runPublishAction(row)} 
+                              className="gap-3 p-3 rounded-xl cursor-pointer font-black text-primary"
+                            >
                               <Rocket className="h-5 w-5" /> Change Pool Visibility
                             </DropdownMenuItem>
                           </DropdownMenuContent>

@@ -167,14 +167,12 @@ export default function InnovatorMarketplacePage() {
   };
 
   const handleApply = (p: MarketplaceProblem) => {
-    const res = applyToMarketplaceProblem(p);
-    if (res.already) {
-      toast.message("Already applied", { description: p.challenge.title });
-      return;
-    }
-    toast.success("Application submitted", {
-      description: `${p.challenge.title} — visible to ${p.challenge.company} on Applicants & Teams.`,
+    toast.success("Redirecting to application flow...", {
+      description: `${p.challenge.title} — opening in recruit portal.`,
     });
+    setTimeout(() => {
+      window.open("https://inpulse-staging-recruitment.web.app", "_blank");
+    }, 1000);
   };
 
   const handleSave = (p: MarketplaceProblem) => {
