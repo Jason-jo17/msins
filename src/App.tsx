@@ -37,6 +37,7 @@ import MsmeApplicantsPage from "./pages/msme/MsmeApplicantsPage";
 import MsmeMatchmakingPage from "./pages/msme/MsmeMatchmakingPage";
 import MsmeBusinessHubPage from "./pages/msme/MsmeBusinessHubPage";
 import MsmeEvaluationWorkspace from "./pages/msme/MsmeEvaluationWorkspace";
+import MsmeTalentHubPage from "./pages/msme/MsmeTalentHubPage";
 import { MentorRoleLayout } from "./pages/mentor/MentorRoleLayout";
 import MentorDashboard from "./pages/mentor/MentorDashboard";
 import MentorTeamsPage from "./pages/mentor/MentorTeamsPage";
@@ -139,6 +140,7 @@ const App = () => (
             <Route path="/msme/applicants" element={<MsmeApplicantsPage />} />
             <Route path="/msme/progress" element={<Navigate to="/msme/applicants" replace />} />
             <Route path="/msme/matchmaking" element={<MsmeMatchmakingPage />} />
+            <Route path="/msme/talent-hub" element={<MsmeTalentHubPage />} />
             <Route path="/msme/challenges/:challengeId/evaluate/:applicantId" element={<MsmeEvaluationWorkspace />} />
             <Route path="/msme/business-hub" element={<MsmeBusinessHubPage />} />
             <Route path="/msme/messages" element={<Navigate to="/msme/business-hub?tab=messages" replace />} />

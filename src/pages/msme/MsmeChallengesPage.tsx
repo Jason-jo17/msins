@@ -52,6 +52,9 @@ import {
 import {
   NAGPUR_NEXT_CHALLENGES,
   NAGPUR_NEXT_PROGRAM_META,
+  NAGPUR_TOTAL_CHALLENGES,
+  NAGPUR_TOTAL_APPLICANTS,
+  NAGPUR_AVG_IMPACT,
   type NagpurNextChallenge,
 } from "@/data/nagpur-next-data";
 import {
@@ -248,7 +251,7 @@ export default function MsmeChallengesPage() {
               <CardContent className="p-4 space-y-1.5 flex flex-col items-center justify-center text-center">
                 <Rocket className="h-4 w-4 text-primary group-hover:-translate-y-1 transition-transform" />
                 <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Active PRDs</p>
-                <p className="text-2xl font-black text-white tracking-tight">13</p>
+                <p className="text-2xl font-black text-white tracking-tight">{NAGPUR_TOTAL_CHALLENGES}</p>
               </CardContent>
             </Card>
             
@@ -256,7 +259,7 @@ export default function MsmeChallengesPage() {
               <CardContent className="p-4 space-y-1.5 flex flex-col items-center justify-center text-center">
                 <UsersIcon className="h-4 w-4 text-blue-400 group-hover:scale-110 transition-transform" />
                 <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Team Solvers</p>
-                <p className="text-2xl font-black text-white tracking-tight">38</p>
+                <p className="text-2xl font-black text-white tracking-tight">{NAGPUR_TOTAL_APPLICANTS}</p>
               </CardContent>
             </Card>
 
@@ -265,7 +268,7 @@ export default function MsmeChallengesPage() {
                 <Zap className="h-4 w-4 text-amber-400 group-hover:rotate-12 transition-transform" />
                 <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Avg Impact</p>
                 <div className="flex items-baseline gap-1 justify-center">
-                  <p className="text-xl font-black text-white tracking-tight">8.2</p>
+                  <p className="text-xl font-black text-white tracking-tight">{NAGPUR_AVG_IMPACT}</p>
                   <p className="text-[10px] font-bold text-white/40">/10</p>
                 </div>
               </CardContent>

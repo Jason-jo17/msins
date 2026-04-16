@@ -15,6 +15,18 @@ import {
   TrendingUp,
   Users,
   Wrench,
+  Mail,
+  MapPin,
+  Globe,
+  Github,
+  Linkedin,
+  Settings,
+  ShieldCheck,
+  Zap,
+  Activity,
+  Award,
+  Briefcase,
+  Building2
 } from "lucide-react";
 import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -73,89 +85,160 @@ export default function InnovatorDashboard() {
 
   const navigate = useNavigate();
   const [taskModal, setTaskModal] = useState<ExecutionTaskRow | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("project-drone");
+
+  const portfolio = (innovatorActiveChallenge as any).portfolioProjects || [];
+  const selectedProject = portfolio.find((p: any) => p.id === selectedProjectId) || portfolio[0];
+  const isDroneProject = selectedProjectId === "project-drone";
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 pb-10">
-      {/* Hero */}
-      <section
-        className={cn(
-          "relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm",
-          "bg-gradient-to-br from-card via-card to-violet-500/[0.07]",
-        )}
-      >
-        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-12 -left-12 h-44 w-44 rounded-full bg-violet-500/10 blur-3xl" />
-        <div className="relative p-6 md:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex min-w-0 gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-lg font-bold text-primary-foreground shadow-md ring-4 ring-primary/15">
-                {hero.initials}
-              </div>
-              <div className="min-w-0 space-y-3">
-                <div>
-                  <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">{hero.name}</h1>
-                  <p className="mt-1 text-sm text-muted-foreground">{hero.roleLine}</p>
-                  <p className="mt-2 text-sm font-medium text-foreground">
-                    Current Project: <span className="text-primary">{hero.currentProject}</span>
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {hero.badges.map((b) => (
-                    <Badge key={b.label} variant="secondary" className="border border-primary/20 bg-primary/[0.06] font-mono text-xs">
-                      {b.label} {b.value}
-                    </Badge>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <Badge variant="outline" className="border-primary/30 bg-primary/[0.06] font-semibold text-primary">
-                    {innovatorActiveChallenge.cohort.programTitle}
-                  </Badge>
-                  <span className="rounded-lg border border-border/80 bg-secondary/60 px-2.5 py-1 font-medium text-foreground">
-                    Cohort: {innovatorActiveChallenge.cohort.name}
-                  </span>
-                  <span className="rounded-lg border border-border/80 bg-secondary/60 px-2.5 py-1 font-medium text-foreground">
-                    Assigned MSME: {hero.assignedMsme}
-                  </span>
-                  <span className="rounded-lg border border-emerald-500/25 bg-emerald-500/[0.08] px-2.5 py-1 font-medium text-emerald-900 dark:text-emerald-100">
-                    {hero.challengeStatus}
-                  </span>
-                  <span className="rounded-lg border border-primary/20 bg-primary/[0.06] px-2.5 py-1 font-mono font-medium text-foreground">
-                    Overall {hero.overallProgressPct}%
-                  </span>
-                  <span className="rounded-lg border border-border/80 bg-background px-2.5 py-1 text-muted-foreground">
-                    Next review: <span className="font-medium text-foreground">{hero.nextReview}</span>
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <span className="rounded-lg border border-border/80 bg-secondary/60 px-2.5 py-1 font-medium text-foreground">
-                    Phase: {hero.currentPhase}
-                  </span>
-                  <span className="rounded-lg border border-violet-500/25 bg-violet-500/[0.08] px-2.5 py-1 font-medium text-violet-900 dark:text-violet-100">
-                    {hero.currentSprint}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {hero.skills.map((s) => (
-                    <Badge key={s} variant="outline" className="border-primary/20 bg-background/80 text-[11px] font-normal">
-                      {s}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+      {/* Merged Profile Header / Hero */}
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-neutral-950 px-8 py-10 shadow-2xl border border-white/5">
+        <div className="absolute top-0 right-0 -m-10 h-[300px] w-[300px] rounded-full bg-primary/20 blur-[80px] opacity-50" />
+        <div className="absolute bottom-0 left-0 -m-16 h-[250px] w-[250px] rounded-full bg-violet-600/20 blur-[80px] opacity-50" />
+        
+        <div className="relative flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
+          <div className="h-24 w-24 rounded-3xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center text-3xl font-black text-white shadow-xl ring-4 ring-white/10 shrink-0">
+            {hero.initials}
+          </div>
+          <div className="space-y-4 flex-1">
+            <div>
+              <h1 className="text-3xl font-black text-white tracking-tight">{hero.name}</h1>
+              <p className="text-violet-300 font-medium">{hero.roleLine}</p>
             </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
-              <Button className="gap-2 shadow-sm" onClick={() => navigate("/innovator/profile")}>
-                View Profile
-                <ChevronRight className="h-4 w-4 opacity-70" />
+            <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+              <Badge variant="outline" className="bg-white/5 border-white/10 text-white/80 py-1 px-3">
+                <MapPin className="h-3 w-3 mr-1.5 opacity-60" /> Nagpur, Maharashtra
+              </Badge>
+              <Badge variant="outline" className="bg-white/5 border-white/10 text-white/80 py-1 px-3">
+                <Mail className="h-3 w-3 mr-1.5 opacity-60" /> kiran@example.com
+              </Badge>
+              <Badge variant="outline" className="bg-white/5 border-white/10 text-white/80 py-1 px-3">
+                <Globe className="h-3 w-3 mr-1.5 opacity-60" /> portfolio.io
+              </Badge>
+            </div>
+            <div className="flex flex-wrap gap-3 pt-2 justify-center md:justify-start">
+              <Button size="sm" variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl text-xs h-9 px-4">
+                <Github className="h-3.5 w-3.5 mr-2" /> GitHub
               </Button>
-              <Button variant="secondary" className="gap-2" onClick={() => navigate("/innovator/recruit-profile")}>
-                Edit Portfolio
-                <ExternalLink className="h-4 w-4 opacity-70" />
+              <Button size="sm" variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl text-xs h-9 px-4">
+                <Linkedin className="h-3.5 w-3.5 mr-2" /> LinkedIn
+              </Button>
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-xs h-9 px-4 font-bold">
+                <Settings className="h-3.5 w-3.5 mr-2" /> Edit Profile
               </Button>
             </div>
           </div>
+
+          <Card className="hidden lg:block w-72 rounded-3xl border-white/10 bg-white/5 backdrop-blur-md overflow-hidden shadow-2xl">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs font-black text-white/80 uppercase tracking-widest flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" /> Career Readiness
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+               <div>
+                  <div className="flex justify-between text-[10px] font-bold text-white/60 uppercase mb-1">
+                    <span>Overall</span>
+                    <span>{innovatorCareerReadiness.portfolioScore}%</span>
+                  </div>
+                  <Progress value={innovatorCareerReadiness.portfolioScore} className="h-1.5 bg-white/10" />
+               </div>
+               <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Tech", val: innovatorCareerReadiness.techMatchPct },
+                    { label: "Soft", val: innovatorCareerReadiness.communicationPct }
+                  ].map(s => (
+                    <div key={s.label}>
+                      <p className="text-[9px] font-bold text-white/40 uppercase mb-1">{s.label}</p>
+                      <Progress value={s.val} className="h-1 bg-white/5" />
+                    </div>
+                  ))}
+               </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Applied Innovation Deck (Project Selector) */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-black tracking-tight flex items-center gap-2">
+            <Zap className="h-5 w-5 text-primary" /> Applied Innovation Deck
+          </h2>
+          <p className="text-xs text-muted-foreground font-medium">Select a project to view detailed execution intelligence</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {portfolio.map((project: any) => (
+            <Card 
+              key={project.id}
+              onClick={() => setSelectedProjectId(project.id)}
+              className={cn(
+                "rounded-[2rem] border-border/50 bg-card transition-all shadow-sm cursor-pointer group relative overflow-hidden",
+                selectedProjectId === project.id ? "ring-2 ring-primary border-primary/50 bg-primary/[0.02]" : "hover:bg-muted/30 opacity-70 grayscale-[0.5] hover:opacity-100 hover:grayscale-0"
+              )}
+            >
+              {selectedProjectId === project.id && (
+                <div className="absolute top-0 right-0 h-12 w-12 bg-primary/10 rounded-bl-[2rem] flex items-center justify-center">
+                  <ArrowRight className="h-5 w-5 text-primary" />
+                </div>
+              )}
+              <CardContent className="p-6 space-y-4">
+                <div className="flex justify-between items-start">
+                  <div className={cn(
+                    "h-12 w-12 rounded-2xl flex items-center justify-center shadow-lg border transition-colors",
+                    selectedProjectId === project.id ? "bg-primary text-primary-foreground border-primary" : "bg-neutral-900 text-primary border-primary/20 group-hover:border-primary"
+                  )}>
+                    {project.icon === "Zap" && <Zap className="h-6 w-6" />}
+                    {project.icon === "Activity" && <Activity className="h-6 w-6" />}
+                    {project.icon === "Target" && <Target className="h-6 w-6" />}
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    {project.isLive && <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase font-mono px-2">Live Challenge</Badge>}
+                    {project.isComingSoon && <Badge variant="secondary" className="bg-muted text-muted-foreground border-none text-[8px] font-black uppercase font-mono px-2">Coming Soon</Badge>}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <Building2 className="h-3 w-3 text-muted-foreground/60" />
+                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest leading-none translate-y-[0.5px]">
+                      {project.company}
+                    </span>
+                  </div>
+                  <h3 className={cn(
+                    "font-black text-lg leading-tight transition-colors",
+                    selectedProjectId === project.id ? "text-primary" : "text-foreground group-hover:text-primary"
+                  )}>{project.title}</h3>
+                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">{project.desc}</p>
+                </div>
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Progress</span>
+                  <span className="text-xs font-black text-foreground">{project.progress}% Complete</span>
+                </div>
+                <Progress value={project.progress} className="h-1.5" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </section>
+
+      {/* Conditional Dashboard Body */}
+      {!isDroneProject ? (
+        <Card className="rounded-[2.5rem] border-border/50 bg-muted/20 py-20 flex flex-col items-center justify-center text-center space-y-4">
+          <div className="h-20 w-20 rounded-full bg-background border border-border flex items-center justify-center shadow-inner">
+             <Lock className="h-10 w-10 text-muted-foreground/30" />
+          </div>
+          <div className="space-y-2 max-w-sm">
+            <h2 className="text-xl font-black text-foreground">Archive or Planning Mode</h2>
+            <p className="text-sm text-muted-foreground font-medium">Detailed execution intelligence is currently locked for this project selection. Select a "Live Challenge" to see real-time metrics.</p>
+          </div>
+          <Button variant="outline" className="rounded-xl" onClick={() => setSelectedProjectId("project-drone")}>
+            Switch back to Live Challenge
+          </Button>
+        </Card>
+      ) : (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
       {/* KPIs — sourced from `innovatorActiveChallenge.dashboard.summaryKpis` */}
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -545,6 +628,9 @@ export default function InnovatorDashboard() {
           ))}
         </div>
       </section>
+        </div>
+      )}
+
 
       <Dialog open={!!taskModal} onOpenChange={(o) => !o && setTaskModal(null)}>
         <DialogContent className="max-w-md rounded-2xl">

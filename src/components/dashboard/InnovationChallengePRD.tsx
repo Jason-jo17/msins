@@ -65,10 +65,10 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Overview</p>
-                <p className="text-sm leading-relaxed">{prd.problem_statement.overview}</p>
+                <p className="text-sm leading-relaxed">{prd.problem_statement?.overview}</p>
               </div>
               
-              {prd.problem_statement.current_state && (
+              {prd.problem_statement?.current_state && (
                 <div className="space-y-2">
                   <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Current Blockers</p>
                   <ul className="space-y-1.5">
@@ -181,7 +181,7 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
                     </div>
 
                     {/* Transcript Feed */}
-                    <div className="lg:col-span-8 h-[450px] overflow-y-auto bg-white/40 dark:bg-black/20 p-6 space-y-6 scrollbar-thin scrollbar-thumb-amber-500/20">
+                    <div className="lg:col-span-8 h-[600px] overflow-y-auto bg-white/40 dark:bg-black/20 p-8 space-y-8 scrollbar-thin scrollbar-thumb-amber-500/20">
                       {interview.transcript.map((msg, i) => (
                         <div key={msg.id} className={`flex flex-col ${msg.speaker === 'Interviewer' ? 'items-start' : 'items-end'}`}>
                           <div className={`max-w-[85%] rounded-2xl p-4 shadow-sm relative ${
@@ -256,7 +256,7 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-6">
-                  {prd.technical_specifications.tech_stack_recommended && (
+                   {prd.technical_specifications?.tech_stack_recommended && (
                     <div className="space-y-2">
                        <p className="text-xs font-bold text-muted-foreground uppercase">Recommended Tools</p>
                        <div className="flex flex-wrap gap-2">
@@ -266,7 +266,7 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
                        </div>
                     </div>
                   )}
-                  {prd.technical_specifications.hardware && (
+                  {prd.technical_specifications?.hardware && (
                     <div className="space-y-2">
                        <p className="text-xs font-bold text-muted-foreground uppercase">Hardware Needs</p>
                        <ul className="text-sm list-disc pl-4 space-y-1">
@@ -274,7 +274,7 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
                        </ul>
                     </div>
                   )}
-                  {prd.technical_specifications.architecture && (
+                  {prd.technical_specifications?.architecture && (
                     <div className="col-span-2 p-3 rounded-lg bg-muted/50 border border-border">
                        <p className="text-xs font-bold text-muted-foreground uppercase mb-1">Preferred Architecture</p>
                        <p className="text-sm">{prd.technical_specifications.architecture}</p>
@@ -294,7 +294,7 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {prd.success_metrics.primary_kpis.map((kpi, i) => (
+              {prd.success_metrics?.primary_kpis?.map((kpi, i) => (
                 <div key={i} className="space-y-2">
                   <div className="flex justify-between items-end">
                     <p className="text-sm font-semibold">{kpi.metric ?? "Metric Improvement"}</p>
@@ -311,6 +311,9 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
                   )}
                 </div>
               ))}
+              {(!prd.success_metrics?.primary_kpis || prd.success_metrics.primary_kpis.length === 0) && (
+                <p className="text-sm text-muted-foreground italic">No specific success metrics defined for this phase.</p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -344,9 +347,12 @@ export function InnovationChallengePRD({ challenge }: InnovationChallengePRDProp
               <div className="space-y-2">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase">Domain Specialization</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {challenge.tags.slice(0, 4).map(tag => (
+                  {challenge.tags?.slice(0, 4).map(tag => (
                     <Badge key={tag} className="text-[10px] py-0">{tag}</Badge>
                   ))}
+                  {(!challenge.tags || challenge.tags.length === 0) && (
+                    <p className="text-[10px] text-muted-foreground italic">No tags defined</p>
+                  )}
                 </div>
               </div>
 

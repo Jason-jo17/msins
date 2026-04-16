@@ -27,6 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { REGIONAL_DATA } from '@/data/regional-data';
+import { NAGPUR_TOTAL_CHALLENGES } from '@/data/nagpur-next-data';
 import { cn } from '@/lib/utils';
 
 // High-fidelity Indicator Card
@@ -158,7 +159,7 @@ export default function CeoRegionDetailPage() {
             {/* Bottom Indicator Grid (Secondary) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <RegionalIndicatorCard label={selectedRegionId === 'nagpur' ? "POWER CAPACITY" : "IT SECTOR VALUE"} value={data.economic_indicators["Power Capacity"] || data.economic_indicators["IT Sector Value"]} />
-                <RegionalIndicatorCard label={selectedRegionId === 'nagpur' ? "SUBSIDY LIMIT" : "INFRASTRUCTURE FOCUS"} value={data.economic_indicators["Subsidy Limit"] || data.economic_indicators["Infrastructure Focus"]} />
+                <RegionalIndicatorCard label={selectedRegionId === 'nagpur' ? "INPULSE INNOVATION PRDs" : "INFRASTRUCTURE FOCUS"} value={selectedRegionId === 'nagpur' ? String(NAGPUR_TOTAL_CHALLENGES) : (data.economic_indicators["Infrastructure Focus"] || "N/A")} />
             </div>
 
             <div className="grid gap-6 lg:grid-cols-3">

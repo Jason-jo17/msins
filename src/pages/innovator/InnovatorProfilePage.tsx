@@ -17,6 +17,7 @@ import {
   Zap,
   Target
 } from "lucide-react";
+import { innovatorActiveChallenge } from "@/data/innovator-active-challenge";
 import { innovatorCareerReadiness } from "@/data/innovator-dashboard-workspace";
 
 export default function InnovatorProfilePage() {
@@ -33,19 +34,19 @@ export default function InnovatorProfilePage() {
         
         <div className="relative flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
           <div className="h-24 w-24 rounded-3xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center text-3xl font-black text-white shadow-xl ring-4 ring-white/10 shrink-0">
-            JS
+            {innovatorActiveChallenge.student.initials}
           </div>
           <div className="space-y-4 flex-1">
             <div>
-              <h1 className="text-3xl font-black text-white tracking-tight">Jason S.</h1>
-              <p className="text-violet-300 font-medium">Principal Full-Stack Innovator · Nagpur NEXT Cohort '26</p>
+              <h1 className="text-3xl font-black text-white tracking-tight">{innovatorActiveChallenge.student.displayName}</h1>
+              <p className="text-violet-300 font-medium">{innovatorActiveChallenge.student.role} · {innovatorActiveChallenge.cohort.name}</p>
             </div>
             <div className="flex flex-wrap gap-2 justify-center md:justify-start">
               <Badge variant="outline" className="bg-white/5 border-white/10 text-white/80 py-1 px-3">
                 <MapPin className="h-3 w-3 mr-1.5 opacity-60" /> Nagpur, Maharashtra
               </Badge>
               <Badge variant="outline" className="bg-white/5 border-white/10 text-white/80 py-1 px-3">
-                <Mail className="h-3 w-3 mr-1.5 opacity-60" /> jason@example.com
+                <Mail className="h-3 w-3 mr-1.5 opacity-60" /> kiran@example.com
               </Badge>
               <Badge variant="outline" className="bg-white/5 border-white/10 text-white/80 py-1 px-3">
                 <Globe className="h-3 w-3 mr-1.5 opacity-60" /> portfolio.io

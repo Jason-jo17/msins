@@ -63,6 +63,7 @@ const shellNavByRole: Record<Exclude<AppShellRole, "ceo">, { items: { title: str
       { title: "Dashboard", url: "/msme/dashboard", icon: LayoutDashboard },
       { title: "Innovation Hub", url: "/msme/challenges", icon: Rocket },
       { title: "Applicants & Teams", url: "/msme/applicants", icon: UserSquare2 },
+      { title: "Talent Hub", url: "/msme/talent-hub", icon: Users },
       { title: "Matchmaking Hub", url: "/msme/matchmaking", icon: Sparkles },
       { title: "Business Hub", url: "/msme/business-hub", icon: Briefcase },
     ],
@@ -376,7 +377,7 @@ export function AppSidebar({ shellRole = "ceo" }: AppSidebarProps) {
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-xs font-bold tracking-tight text-sidebar-primary-foreground ring-2 ring-sidebar-primary/35"
               title={`${ws.profileName} · ${ws.profileSubtitle}`}
             >
-              {ws.avatarLabel}
+              {ws.profileName.charAt(0)}
             </div>
             {!collapsed && (
               <div className="min-w-0 flex-1 pt-0.5">

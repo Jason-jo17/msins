@@ -14,8 +14,38 @@ export const innovatorActiveChallenge = {
   student: {
     displayName: "Kiran",
     initials: "K",
-    role: "Innovator",
+    role: "Principal Full-Stack Innovator",
   },
+  portfolioProjects: [
+    {
+      id: "project-drone",
+      title: "SAR Drone Lighting Systems",
+      company: "Navitas (Zero Systems)",
+      desc: "Collaborating with Navitas (Zero Systems) on adaptive optics for UAV search operations.",
+      progress: 85,
+      isLive: true,
+      icon: "Zap"
+    },
+    {
+      id: "project-ev",
+      title: "VibrationSense AI",
+      company: "TATA Motors (Industrial)",
+      desc: "Predictive maintenance for industrial motor assemblies using edge-compute tensors.",
+      progress: 100,
+      isLive: false,
+      icon: "Activity"
+    },
+    {
+      id: "project-future",
+      title: "Autonomous Fleet Integration",
+      company: "Future Mobility Hub",
+      desc: "Next phase system integration and pilot testing for mass manufacturing workflows.",
+      progress: 0,
+      isLive: false,
+      isComingSoon: true,
+      icon: "Target"
+    }
+  ],
   cohort: {
     name: "Nagpur NEXT",
     programTitle: "Nagpur NEXT Program",

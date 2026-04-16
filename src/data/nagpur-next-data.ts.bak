@@ -1,4 +1,4 @@
-import { type MsmeChallengeListItem } from "./msme-challenges-list";
+﻿import { type MsmeChallengeListItem } from "./msme-challenges-list";
 
 export interface ProgramMetadata {
   program: string;
@@ -147,7 +147,6 @@ export interface NagpurNextChallenge extends MsmeChallengeListItem {
   expected_outcome: string;
   complexity: "Variable" | "Low" | "Medium" | "High" | "Very High";
   skills_required: string[];
-  tags?: string[];
   prd?: ChallengePRD;
   mosi_interviews?: MosiInterview[];
   reference_videos?: string[];
@@ -354,12 +353,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Power", target: "<50W" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-11-001", category: "Optics", requirement: "Dynamic beam angle control (10° to 120°) via flight controller command", priority: "P0" },
-        { id: "FR-11-002", category: "Power", requirement: "Peak power consumption restricted to <50W for battery preservation", priority: "P0" },
-        { id: "FR-11-003", category: "Integration", requirement: "MAVLink protocol support for synchronized camera tracking", priority: "P1" },
-        { id: "FR-11-004", category: "Lighting", requirement: "Multi-spectrum switching (White, Red, IR) within a single unit", priority: "P2" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹5-8 Lakhs for prototype",
@@ -545,12 +538,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "False Alarm Rate", target: "<1%" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-12-001", category: "Detection", requirement: "Real-time thermal hot-spot detection (80°C - 120°C) using IR array", priority: "P0" },
-        { id: "FR-12-002", category: "AI", requirement: "Anomalous heat pattern recognition to suppress false alarms from machinery", priority: "P0" },
-        { id: "FR-12-003", category: "Suppression", requirement: "Automatic pan-tilt turret orientation toward detected heat centroid", priority: "P1" },
-        { id: "FR-12-004", category: "Safety", requirement: "Targeted water-mist deployment with <10 second response delay", priority: "P1" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹8-12 Lakhs for prototype",
@@ -742,7 +729,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
         { id: "FR-001", category: "Job Management", requirement: "Digital job card creation with barcode/QR assignment", priority: "P0" },
         { id: "FR-002", category: "Job Management", requirement: "Real-time job status tracking", priority: "P0" },
         { id: "FR-003", category: "Machine Monitoring", requirement: "Machine status dashboard", priority: "P0" },
-        { id: "FR-004", category: "Analytics", requirement: "Automated OEE calculation and downtime root-cause reporting", priority: "P1" },
       ],
       success_metrics: {
         primary_kpis: [
@@ -940,12 +926,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Fleet Utilization", baseline: "40%", target: "75%" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-03-001", category: "Mechanical", requirement: "Assisted quick-swap docking mechanism handling >200kg battery packs", priority: "P0" },
-        { id: "FR-03-002", category: "Connectivity", requirement: "Standardized IP67-rated power/data connector for agricultural environments", priority: "P0" },
-        { id: "FR-03-003", category: "BMS", requirement: "Real-time telemetry (SoC, SoH, Temperature) via CAN-to-Cloud gateway", priority: "P1" },
-        { id: "FR-03-004", category: "Infrastructure", requirement: "Charging station logic for solar-priority multi-pack rotation", priority: "P2" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹15-25 Lakhs for prototype system",
@@ -1134,12 +1114,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Material Waste", baseline: "15-20%", target: "<8%" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-04-001", category: "Visualization", requirement: "Dimension-based 3D furniture configurator with real-time feedback", priority: "P0" },
-        { id: "FR-04-002", category: "Manufacturing", requirement: "Automated DXF/SVG vector generation from custom dimensions", priority: "P0" },
-        { id: "FR-04-003", category: "Optimization", requirement: "Intelligent sheet-metal nesting engine to maximize material yield", priority: "P1" },
-        { id: "FR-04-004", category: "E-commerce", requirement: "Dynamic cost estimation engine for instant customer quoting", priority: "P2" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹3-5 Lakhs for MVP platform",
@@ -1328,12 +1302,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Gain", target: "30-40 dB" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-05-001", category: "Performance", requirement: "Power Added Efficiency (PAE) > 40% across VHF/UHF bands", priority: "P0" },
-        { id: "FR-05-002", category: "RF Design", requirement: "Stable 30-40 dB gain with high linearity for tactical data", priority: "P0" },
-        { id: "FR-05-003", category: "Environmental", requirement: "Operational capability in temperatures ranging from -40°C to +70°C", priority: "P1" },
-        { id: "FR-05-004", category: "Standards", requirement: "Design compliance with JSS 55555 and MIL-STD-810/461", priority: "P1" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹5-8 Lakhs for prototype",
@@ -1505,12 +1473,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Energy Efficiency", target: "30-40% better than box units" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-06-001", category: "Modularity", requirement: "Stackable interface for hot-swapping HEPA, Bio, and Carbon modules", priority: "P0" },
-        { id: "FR-06-002", category: "Sensing", requirement: "Integrated PM2.5, VOC, and CO2 monitoring with dashboard output", priority: "P0" },
-        { id: "FR-06-003", category: "Intelligence", requirement: "Auto-module recognition for fan-speed and airflow optimization", priority: "P1" },
-        { id: "FR-06-004", category: "Maintenance", requirement: "Predictive saturation alerts for filter/plant-module care", priority: "P2" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹3-5 Lakhs for prototype",
@@ -1546,9 +1508,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
       "Demonstrate working digital caliper prototype",
     ],
     expected_outcome: "Made-in-India digital measurement system with data connectivity.",
-    complexity: "High",
-    skills_required: ["Embedded Systems", "Wireless Protocols", "UI/UX Development", "Metrology"],
-    tags: ["Metrology", "IoT", "Precision Engineering", "Import Substitution", "Digital QC"],
     mosi_interviews: [
       {
         id: "mosi-nag-007",
@@ -1662,19 +1621,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
     ],
     complexity: "High",
     prd: {
-      executive_summary: "Develop an indigenous digital caliper with Bluetooth connectivity for real-time data transfer.",
-      success_metrics: {
-        primary_kpis: [
-          { metric: "Resolution", target: "0.01mm" },
-          { metric: "Price", target: "₹5,000-8,000" },
-        ],
-      },
-      functional_requirements: [
-        { id: "FR-07-001", category: "Metrology", requirement: "Capacitive sensing scale with 0.01mm (10 micron) resolution", priority: "P0" },
-        { id: "FR-07-002", category: "Wireless", requirement: "BLE 5.0 wireless sync to host tablet on 'Send' button trigger", priority: "P0" },
-        { id: "FR-07-003", category: "Power", requirement: "Ultra-low power sleep modes for 12-month battery life on CR2032", priority: "P1" },
-        { id: "FR-07-004", category: "Software", requirement: "Integration with mobile SPC charts for real-time pass/fail logic", priority: "P2" },
-      ],
       timeline_weeks: 12,
       budget_estimate: "₹3-5 Lakhs for prototype",
     },
@@ -1721,12 +1667,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Setup Time", baseline: "60 min", target: "<5 min" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-08-001", category: "Automation", requirement: "Programmable servo-controlled winding for 10-45 AWG wire gauges", priority: "P0" },
-        { id: "FR-08-002", category: "Quality", requirement: "Active closed-loop wire tension control to prevent insulation damage", priority: "P0" },
-        { id: "FR-08-003", category: "Metrology", requirement: "Digital turn-counting with <0.1% error and wire-break detection", priority: "P1" },
-        { id: "FR-08-004", category: "Setup", requirement: "Quick-change fixture system to reduce job-change setup time to <10 min", priority: "P1" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹8-12 Lakhs for retrofit",
@@ -1773,12 +1713,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Quality Rejects", baseline: "5%", target: "<2%" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-09-001", category: "Mechanical", requirement: "Adaptive abrasive peeling mechanism that adjusts to onion size variations", priority: "P0" },
-        { id: "FR-09-002", category: "Sensing", requirement: "Inline NIR moisture sensing for real-time dehydration control", priority: "P0" },
-        { id: "FR-09-003", category: "Automation", requirement: "Closed-loop conveyor speed control based on output moisture feedback", priority: "P1" },
-        { id: "FR-09-004", category: "Traceability", requirement: "Automated yield tracking system (Input weight vs Processed weight)", priority: "P2" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹12-18 Lakhs for pilot",
@@ -1825,12 +1759,6 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Widget Size", target: "<50KB" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-10-001", category: "Performance", requirement: "Lightweight frontend widget footprint (<50KB) for minimal impact", priority: "P0" },
-        { id: "FR-10-002", category: "Logic", requirement: "Context-aware feedback triggers based on user behavioral events", priority: "P0" },
-        { id: "FR-10-003", category: "Analytics", requirement: "Real-time NLP sentiment analysis engine for categorizing frustration", priority: "P1" },
-        { id: "FR-10-004", category: "Security", requirement: "Privacy-by-design architecture with zero PII/Personal data capture", priority: "P1" },
-      ],
 
       timeline_weeks: 12,
       budget_estimate: "₹3-5 Lakhs for MVP",
@@ -1880,12 +1808,669 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
           { metric: "Response Time", baseline: "40 min", target: "<5 min" },
         ],
       },
-      functional_requirements: [
-        { id: "FR-13-001", category: "Positioning", requirement: "Centimeter-level indoor positioning (1-3m) using UWB tech", priority: "P0" },
-        { id: "FR-13-002", category: "Network", requirement: "Self-healing mesh network for data relay in GPS-denied zones", priority: "P0" },
-        { id: "FR-13-003", category: "Safety", requirement: "Wearable vitals monitoring (HR, Temp) with IMU fall detection", priority: "P1" },
-        { id: "FR-13-004", category: "Certification", requirement: "Intrinsically safe (ATEX/PESO) hardware design for hazardous zones", priority: "P1" },
-      ],
+
+      timeline_weeks: 12,
+      budget_estimate: "₹10-15 Lakhs for pilot",
+    },
+  },
+];
+
+    skills_required: ["Embedded Systems", "Bluetooth/BLE", "Mobile App Development", "Precision Mechanics"],
+    tags: ["Make in India", "Precision Engineering", "Metrology", "Quality Control", "SPC"],
+    prd: {
+      executive_summary: "Develop an indigenous digital caliper with Bluetooth connectivity for real-time data transfer.",
+      success_metrics: {
+        primary_kpis: [
+{ metric: "Resolution", target: "0.01mm" },
+          { metric: "Price", target: "₹5,000-8,000" },
+        ],
+      },
+
+      timeline_weeks: 12,
+      budget_estimate: "₹3-5 Lakhs for prototype",
+    },
+  },
+  {
+    id: "challenge-nag-008",
+    challenge_number: 8,
+    official_title: "Transformer Manufacturing",
+    title: "Transformer Coil Winding Automation",
+    domain: "Manufacturing / Automation",
+    tech_stack: ["Coil Winding Machines", "Process Monitoring", "Quality Control Systems"],
+    hmw_statement: "How might we transform labor-intensive inductor and transformer manufacturing into a streamlined, reliable process?",
+    challenge_overview: "Manual winding and testing in SMEs leads to quality variations and worker fatigue. Needs automated winding mechanisms with multi-gauge handling.",
+    company: "Beta Computronics Pvt. Ltd.",
+    region: "Nagpur",
+    department: "Production",
+    sector: "Manufacturing",
+    status: "Published",
+    applicants: 9,
+    progress: 0,
+    publishedToInnovators: true,
+    lastUpdated: "Apr 15, 2026",
+    verificationStage: "live",
+    summary: "Servo-based winding automation to reduce defects and setup time in transformer manufacturing.",
+    problemLocation: "Beta Computronics Unit",
+    businessImpact: "Setup time <5 mins (was 60 mins); defects <2%.",
+    desiredOutcome: "Precision winding with closed-loop tension control and digital counting.",
+    student_deliverables: [
+      "Design automated winding mechanisms",
+      "Improve fixtures and tooling for consistency",
+      "Develop process monitoring for quality control",
+      "Integrate digital traceability",
+    ],
+    expected_outcome: "Streamline transformer manufacturing with improved consistency.",
+    mosi_interviews: [
+      {
+        id: "mosi-nag-008",
+        challenge_id: "challenge-nag-008",
+        company_id: "company-beta-008",
+        stakeholder_id: "stakeholder-beta-01",
+        status: "Published",
+        date: "2026-04-02",
+        duration: 2700,
+        summary: "Discovery session on transformer coil winding automation, exploring precision requirements and process monitoring needs for improved quality and consistency.",
+        problem_summary: "Manual coil winding is labor-intensive, inconsistent, and leads to high reject rates. Setup time for different coil types is long. Need automated, programmable winding.",
+        potential_roi: "50% increase in production throughput; 70% reduction in setup time; 80% reduction in winding defects.",
+        tech_stack_recommended: ["PLC (Schneider/Siemens)", "Servo motors", "Load cells", "HMI", "Modbus TCP"],
+        metadata: {
+          stakeholder: "Sanjay Wasule",
+          designation: "Director",
+          company: "Beta Computronics Pvt. Ltd.",
+          location: "Nagpur, Maharashtra",
+          session_name: "Transformer Winding Automation Discovery"
+        },
+        transcript: [
+          {
+            "id": "t1",
+            "speaker": "Interviewer",
+            "text": "Sanjay ji, Beta Computronics has been in transformer manufacturing for a long time. What's the biggest bottleneck now?",
+            "timestamp": 60,
+            "status": "Approved"
+          },
+          {
+            "id": "t2",
+            "speaker": "Sanjay",
+            "text": "It's the winding process. We make hundreds of different types of inductors and small transformers. Most are still wound on semi-manual machines. The operator has to manually guide the wire, count the turns, and adjust the tension.",
+            "timestamp": 120,
+            "status": "Approved"
+          },
+          {
+            "id": "t3",
+            "speaker": "Interviewer",
+            "text": "What are the issues with this manual approach?",
+            "timestamp": 180,
+            "status": "Approved"
+          },
+          {
+            "id": "t4",
+            "speaker": "Sanjay",
+            "text": "Human fatigue leads to errors. Wrong turn count, overlapping wires, uneven tension. This shows up as quality failures in the final test. And our skilled winders are retiring – the younger generation doesn't want to do this repetitive work.",
+            "timestamp": 240,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t5",
+            "speaker": "Interviewer",
+            "text": "How many different wire gauges do you handle?",
+            "timestamp": 300,
+            "status": "Approved"
+          },
+          {
+            "id": "t6",
+            "speaker": "Sanjay",
+            "text": "Anything from 10 AWG down to 45 AWG. Some are very fine, like human hair. The machine needs to be extremely gentle yet precise. For the heavy wire, it needs high torque for tight winding.",
+            "timestamp": 360,
+            "status": "Approved"
+          },
+          {
+            "id": "t7",
+            "speaker": "Interviewer",
+            "text": "What would a 'smart' winding machine do differently?",
+            "timestamp": 420,
+            "status": "Approved"
+          },
+          {
+            "id": "t8",
+            "speaker": "Sanjay",
+            "text": "Fully programmable. You select the transformer model from a menu, and the machine sets the pitch, tension, and turn count automatically. It should detect wire breaks and stop instantly. And it needs to log every coil's data for traceability.",
+            "timestamp": 480,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t9",
+            "speaker": "Interviewer",
+            "text": "Tell us about tension control.",
+            "timestamp": 540,
+            "status": "Approved"
+          },
+          {
+            "id": "t10",
+            "speaker": "Sanjay",
+            "text": "That's the hardest part. If tension is too low, the coil is loose and bulky. Too high, and the insulation gets damaged or the wire stretches. We need active, closed-loop tension control that stays constant regardless of the spool speed or size.",
+            "timestamp": 600,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t11",
+            "speaker": "Interviewer",
+            "text": "What would this mean for your production capacity?",
+            "timestamp": 660,
+            "status": "Approved"
+          },
+          {
+            "id": "t12",
+            "speaker": "Sanjay",
+            "text": "Current setup time for a new coil is 60 minutes. With a programmable machine, it should be 5 minutes. That alone would let us do many more small batches profitably. And one operator could manage 3-4 machines instead of just one.",
+            "timestamp": 720,
+            "status": "Approved"
+          }
+        ]
+      }
+    ],
+    reference_videos: ["https://youtu.be/lequv5Bh6yE", "https://youtu.be/lKdDKrGZrcw"],
+    complexity: "High",
+    skills_required: ["PLC Programming", "Servo Systems", "Mechanical Design", "Industrial IoT"],
+    tags: ["Transformer", "Automation", "PLC", "Quality Control", "Industry 4.0"],
+    prd: {
+      executive_summary: "Design a precision winding automation system with closed-loop tension control.",
+      success_metrics: {
+        primary_kpis: [
+{ metric: "Defect Rate", baseline: "5%", target: "<2%" },
+          { metric: "Setup Time", baseline: "60 min", target: "<5 min" },
+        ],
+      },
+
+      timeline_weeks: 12,
+      budget_estimate: "₹8-12 Lakhs for retrofit",
+    },
+  },
+  {
+    id: "challenge-nag-009",
+    challenge_number: 9,
+    official_title: "Improving the Yield of Food Processing Centers",
+    title: "Food Processing Yield Improvement",
+    domain: "Food Processing / AgriTech",
+    tech_stack: ["Automation", "Machine Design", "Computer Vision", "Process Optimization"],
+    hmw_statement: "How might we develop machinery that minimizes peeling and cutting losses for processed onion products?",
+    challenge_overview: "Yield losses occur during manual peeling/cutting due to onion size/shape variations. Needs adaptive machinery to maintain precision.",
+    company: "Baron Integrated Services Pvt. Ltd.",
+    region: "Nagpur",
+    department: "Process Floor",
+    sector: "Food Processing",
+    status: "Published",
+    applicants: 11,
+    progress: 0,
+    publishedToInnovators: true,
+    lastUpdated: "Apr 15, 2026",
+    verificationStage: "live",
+    summary: "Yield monitoring and adaptive drying for onion processing to save ₹50-80L annually.",
+    problemLocation: "Baron Dehydration Unit",
+    businessImpact: "Yield +0.5% (significant revenue); energy -20%.",
+    desiredOutcome: "Inline moisture measurement and adaptive heat control.",
+    student_deliverables: [
+      "Analyze current peeling/cutting loss points",
+      "Develop innovative machinery designs",
+      "Design for size/shape variation tolerance",
+      "Maintain product quality while maximizing yield",
+    ],
+    expected_outcome: "Redefine onion processing with minimal loss.",
+    mosi_interviews: [
+      {
+        id: "mosi-nag-009",
+        challenge_id: "challenge-nag-009",
+        company_id: "company-baron-009",
+        stakeholder_id: "stakeholder-baron-01",
+        status: "Published",
+        date: "2026-04-03",
+        duration: 2400,
+        summary: "Discovery session on food processing yield improvement, focusing on onion dehydration and the need for adaptive moisture control and peeling automation.",
+        problem_summary: "Manual peeling leads to 5-10% yield loss due to variations in onion size. Dehydration process lacks real-time moisture monitoring, leading to energy waste and quality inconsistency.",
+        potential_roi: "3-5% increase in usable yield; 20% reduction in energy consumption; ₹50-80 Lakhs annual profit increase.",
+        tech_stack_recommended: ["NIR Sensors", "OpenCV", "PLC", "Delta VFD", "InfluxDB"],
+        metadata: {
+          stakeholder: "Amit Agrawal",
+          designation: "Managing Director",
+          company: "Baron Integrated Services Pvt. Ltd.",
+          location: "Nagpur, Maharashtra",
+          session_name: "Onion Processing Yield Discovery"
+        },
+        transcript: [
+          {
+            "id": "t1",
+            "speaker": "Interviewer",
+            "text": "Amit ji, tell us about Baron Integrated and your onion dehydration plant.",
+            "timestamp": 60,
+            "status": "Approved"
+          },
+          {
+            "id": "t2",
+            "speaker": "Amit",
+            "text": "We are one of the largest exporters of dehydrated onion products in the region. We process tens of tons of onions every day. But in food processing, yield is everything. Even a 1% loss at our scale is millions of rupees.",
+            "timestamp": 120,
+            "status": "Approved"
+          },
+          {
+            "id": "t3",
+            "speaker": "Interviewer",
+            "text": "Where are the biggest yield losses happening?",
+            "timestamp": 180,
+            "status": "Approved"
+          },
+          {
+            "id": "t4",
+            "speaker": "Amit",
+            "text": "First, the peeling stage. Onions come in all shapes and sizes. Manual peeling is inconsistent. Automatic abrasive peelers often take off too much of the usable outer layers. We need 'surgical' peeling that adapts to the onion size.",
+            "timestamp": 240,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t5",
+            "speaker": "Interviewer",
+            "text": "What about the dehydration stage itself?",
+            "timestamp": 300,
+            "status": "Approved"
+          },
+          {
+            "id": "t6",
+            "speaker": "Amit",
+            "text": "The dryer is a black box. We set a temperature and speed based on experience. But the moisture content of incoming onions varies. Sometimes we over-dry, which wastes energy and spoils the color. Sometimes we under-dry, and have to re-process.",
+            "timestamp": 360,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t7",
+            "speaker": "Interviewer",
+            "text": "How do you currently measure moisture?",
+            "timestamp": 420,
+            "status": "Approved"
+          },
+          {
+            "id": "t8",
+            "speaker": "Amit",
+            "text": "Manual sampling. Every hour, a lab tech takes a sample, dries it in an oven, and weighs it. It takes 20 minutes to get a result. By then, hundreds of kilos have already passed through the dryer. We need inline, real-time moisture sensing.",
+            "timestamp": 480,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t9",
+            "speaker": "Interviewer",
+            "text": "What technologies have you explored?",
+            "timestamp": 540,
+            "status": "Approved"
+          },
+          {
+            "id": "t10",
+            "speaker": "Amit",
+            "text": "NIR (Near-Infrared) sensors seem promising for moisture. For peeling, maybe computer vision to guide the knives? We need something robust that can work in a wet, humid environment 24/7.",
+            "timestamp": 600,
+            "status": "Approved"
+          },
+          {
+            "id": "t11",
+            "speaker": "Interviewer",
+            "text": "What would be the total business impact of solving these?",
+            "timestamp": 660,
+            "status": "Approved"
+          },
+          {
+            "id": "t12",
+            "speaker": "Amit",
+            "text": "If yield improves by 2-3% and energy costs drop by 15-20%, we're looking at ₹50-80 lakhs in additional profit every year. That's a huge return on investment for any automation we put in.",
+            "timestamp": 720,
+            "status": "Approved"
+          }
+        ]
+      }
+    ],
+    complexity: "Medium",
+    skills_required: ["Process Engineering", "IoT/Sensors", "Machine Learning", "Food Science"],
+    tags: ["Food Processing", "Dehydration", "AI/ML", "Process Optimization", "AgriTech"],
+    prd: {
+      executive_summary: "Develop AI-powered process optimization for dehydration plants.",
+      success_metrics: {
+        primary_kpis: [
+{ metric: "Yield Improvement", target: "+0.5% net" },
+          { metric: "Quality Rejects", baseline: "5%", target: "<2%" },
+        ],
+      },
+
+      timeline_weeks: 12,
+      budget_estimate: "₹12-18 Lakhs for pilot",
+    },
+  },
+  {
+    id: "challenge-nag-010",
+    challenge_number: 10,
+    official_title: "Real-time Feedback Tool for User Experience",
+    title: "Real-time UX Feedback Tool",
+    domain: "Product Development / UX",
+    tech_stack: ["Web/Mobile Plugins", "Analytics", "Real-time Processing", "Dashboards"],
+    hmw_statement: "How might we design a tool that seamlessly captures user experience data during initial product interactions?",
+    challenge_overview: "Standard surveys have 2% response rates. Need an in-context, lightweight widget to capture sentiment during onboarding or first use.",
+    company: "Techwalnut Innovations LLP",
+    region: "Nagpur",
+    department: "Software Product",
+    sector: "Product Development",
+    status: "Published",
+    applicants: 6,
+    progress: 0,
+    publishedToInnovators: true,
+    lastUpdated: "Apr 15, 2026",
+    verificationStage: "live",
+    summary: "Lightweight (<50KB) privacy-first UX feedback widget with real-time sentiment analysis.",
+    problemLocation: "Techwalnut SaaS Platform",
+    businessImpact: "Response rates 10-15%; time-to-insight reduced to hours.",
+    desiredOutcome: "Sentiment-linked behavioral data with auto-theming of feedback.",
+    student_deliverables: [
+      "Design intuitive feedback mechanisms",
+      "Develop real-time analysis pipeline",
+      "Create visualization dashboards for product teams",
+      "Integrate with development workflows",
+    ],
+    expected_outcome: "Enable teams to rapidly address user pain points.",
+    mosi_interviews: [
+      {
+        id: "mosi-nag-010",
+        challenge_id: "challenge-nag-010",
+        company_id: "company-techwalnut-010",
+        stakeholder_id: "stakeholder-techwalnut-01",
+        status: "Published",
+        date: "2026-04-04",
+        duration: 1800,
+        summary: "Discovery session on real-time UX feedback tools, exploring the need for lightweight, context-aware feedback capture in SaaS products.",
+        problem_summary: "Conventional surveys have very low response rates (<3%). Feedback is often disconnected from the specific user action. Need a widget that captures sentiment in-the-moment without being intrusive.",
+        potential_roi: "5x increase in feedback volume; 70% reduction in time-to-insight for product teams; improved user retention through faster issue resolution.",
+        tech_stack_recommended: ["Preact", "Shadow DOM", "NLP / Sentiment Analysis", "WebSockets", "MongoDB"],
+        metadata: {
+          stakeholder: "Saurabh Bagade",
+          designation: "Founder",
+          company: "Techwalnut Innovations LLP",
+          location: "Nagpur, Maharashtra",
+          session_name: "Real-time UX Feedback Discovery"
+        },
+        transcript: [
+          {
+            "id": "t1",
+            "speaker": "Interviewer",
+            "text": "Saurabh, Techwalnut builds a lot of custom software. Why are you interested in a new feedback tool?",
+            "timestamp": 60,
+            "status": "Approved"
+          },
+          {
+            "id": "t2",
+            "speaker": "Saurabh",
+            "text": "When we launch a new product for a client, we struggle to know if users actually like the interface. We send Typeform or Google Form links, but response rates are pathetic – maybe 2%.",
+            "timestamp": 120,
+            "status": "Approved"
+          },
+          {
+            "id": "t3",
+            "speaker": "Interviewer",
+            "text": "What's wrong with existing tools like Hotjar or Intercom?",
+            "timestamp": 180,
+            "status": "Approved"
+          },
+          {
+            "id": "t4",
+            "speaker": "Saurabh",
+            "text": "They're too heavy. They slow down the page load because they're 500KB or more. And they're generic – 'Rate your experience 1 to 10'. That doesn't tell me *why* they're frustrated with a specific 'Add to Cart' button.",
+            "timestamp": 240,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t5",
+            "speaker": "Interviewer",
+            "text": "What would a 'better' widget look like?",
+            "timestamp": 300,
+            "status": "Approved"
+          },
+          {
+            "id": "t6",
+            "speaker": "Saurabh",
+            "text": "Ultra-lightweight, under 50KB. It should be context-aware – it knows which page you're on and what you just did. It should capture small 'micro-moments' of friction. Maybe just a quick hover or a single tap reaction.",
+            "timestamp": 360,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t7",
+            "speaker": "Interviewer",
+            "text": "How do you want to analyze this data?",
+            "timestamp": 420,
+            "status": "Approved"
+          },
+          {
+            "id": "t8",
+            "speaker": "Saurabh",
+            "text": "Real-time sentiment analysis. If 10 users in an hour are getting frustrated on the checkout page, I want an alert. We should see words like 'confusing' or 'slow' immediately, not in a weekly report.",
+            "timestamp": 480,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t9",
+            "speaker": "Interviewer",
+            "text": "What about user privacy?",
+            "timestamp": 540,
+            "status": "Approved"
+          },
+          {
+            "id": "t10",
+            "speaker": "Saurabh",
+            "text": "Crucial. No personal data capture. Just behavioral events and sentiment. It must be GDRP/DPDP compliant by design. That's a big selling point for our enterprise clients.",
+            "timestamp": 600,
+            "status": "Approved"
+          },
+          {
+            "id": "t11",
+            "speaker": "Interviewer",
+            "text": "How would product teams use the output?",
+            "timestamp": 660,
+            "status": "Approved"
+          },
+          {
+            "id": "t12",
+            "speaker": "Saurabh",
+            "text": "A dashboard with 'Heatmaps of Frustration'. Link the feedback directly to user session recordings if they exist. It turns vague 'UX improvement' into specific, actionable tickets for developers.",
+            "timestamp": 720,
+            "status": "Approved"
+          }
+        ]
+      }
+    ],
+    complexity: "Medium",
+    skills_required: ["Frontend Development", "Backend Development", "NLP/ML", "Product Design"],
+    tags: ["UX Research", "SaaS", "Product Analytics", "Sentiment Analysis", "Customer Feedback"],
+    prd: {
+      executive_summary: "Build a lightweight UX feedback widget for in-context sentiment capture.",
+      success_metrics: {
+        primary_kpis: [
+{ metric: "Response Rate", baseline: "2%", target: ">10%" },
+          { metric: "Widget Size", target: "<50KB" },
+        ],
+      },
+
+      timeline_weeks: 12,
+      budget_estimate: "₹3-5 Lakhs for MVP",
+    },
+  },
+
+
+  {
+    id: "challenge-nag-013",
+    challenge_number: 13,
+    official_title: "Worker Safety System",
+    title: "Raksha: GPS-Denied Safety Tracking",
+    domain: "Worker Safety / IoT",
+    tech_stack: ["UWB/BLE Mesh", "Wearable Sensors", "LoRaWAN", "Edge Computing"],
+    hmw_statement: "How might we enable location tracking and vitals monitoring for workers in GPS-denied confined spaces?",
+    challenge_overview: "Mines and boilers have no cellular/GPS. Need UWB/BLE mesh networks to monitor vitals and location for emergency response.",
+    company: "Hixaa Technologies Private Limited",
+    region: "Nagpur",
+    department: "Safety IoT",
+    sector: "Industrial Safety",
+    status: "Published",
+    applicants: 18,
+    progress: 0,
+    publishedToInnovators: true,
+    lastUpdated: "Apr 15, 2026",
+    verificationStage: "live",
+    summary: "UWB positioning and vital sign mesh network for workers in tunnels and mines.",
+    problemLocation: "Mines / Confined Spaces",
+    businessImpact: "Emergency response <5 mins; real-time location visibility.",
+    desiredOutcome: "1-3m positioning accuracy with man-down detection.",
+    student_deliverables: [
+      "Design GPS-denied location tracking (UWB)",
+      "Develop wearable vits monitoring",
+      "Create local mesh/LoRa network",
+      "Implement SOS/Panic alert systems",
+    ],
+    expected_outcome: "Real-time worker safety in connectivity-challenged environments.",
+    mosi_interviews: [
+      {
+        id: "mosi-nag-013",
+        challenge_id: "challenge-nag-013",
+        company_id: "company-hixaa-013",
+        stakeholder_id: "stakeholder-hixaa-01",
+        status: "Published",
+        date: "2026-04-07",
+        duration: 3000,
+        summary: "Technical discovery session on GPS-denied worker safety tracking, exploring UWB and mesh networking requirements for confined industrial spaces.",
+        problem_summary: "Confined spaces like boilers, tunnels, and ships have zero GPS/Cellular signal. In case of an emergency (man-down), locating the worker takes too long. Need high-precision indoor tracking and vitals monitoring.",
+        potential_roi: "Emergency response time reduced from 40 min to <5 min; potential to save multiple lives annually; 30% reduction in safety compliance costs.",
+        tech_stack_recommended: ["Decawave UWB", "BLE Mesh", "LoRaWAN Gateway", "C++ / FreeRTOS", "React/Mapbox"],
+        metadata: {
+          stakeholder: "Prashant Belkhode",
+          designation: "Managing Director",
+          company: "Hixaa Technologies Private Limited",
+          location: "Nagpur, Maharashtra",
+          session_name: "GPS-Denied Safety Tracking Discovery"
+        },
+        transcript: [
+          {
+            "id": "t1",
+            "speaker": "Interviewer",
+            "text": "Prashant ji, Hixaa is doing pioneering work in safety. Tell us about the Raksha platform and this specific challenge.",
+            "timestamp": 60,
+            "status": "Approved"
+          },
+          {
+            "id": "t2",
+            "speaker": "Prashant",
+            "text": "Our Raksha platform already handles factory safety using IoT. But we have a critical gap in 'GPS-denied' environments – think inside huge boilers in power plants, or multi-level underground mines, or even the hull of a ship during construction.",
+            "timestamp": 120,
+            "status": "Approved"
+          },
+          {
+            "id": "t3",
+            "speaker": "Interviewer",
+            "text": "Why is safety harder there?",
+            "timestamp": 180,
+            "status": "Approved"
+          },
+          {
+            "id": "t4",
+            "speaker": "Prashant",
+            "text": "Zero GPS signal. Thick steel or rock blocks all standard wireless. If a worker collapses due to gas or heat, we don't even know where they are. We've had cases where it took 40 minutes to find a man-down. That's usually the difference between life and death.",
+            "timestamp": 240,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t5",
+            "speaker": "Interviewer",
+            "text": "What level of positioning accuracy do you need?",
+            "timestamp": 300,
+            "status": "Approved"
+          },
+          {
+            "id": "t6",
+            "speaker": "Prashant",
+            "text": "In a complex boiler, we need 1-2 meter accuracy. WiFi or BLE beaconing gives 5-10 meters, which isn't enough when there are dozens of pipes and levels. We're looking at UWB (Ultra-Wideband) for this.",
+            "timestamp": 360,
+            "status": "Approved"
+          },
+          {
+            "id": "t7",
+            "speaker": "Interviewer",
+            "text": "How will the data reach the outside world?",
+            "timestamp": 420,
+            "status": "Approved"
+          },
+          {
+            "id": "t8",
+            "speaker": "Prashant",
+            "text": "Mesh networking. Every worker's wearable acts as a node. They relay signals to one another until it reaches a gateway at the exit. And that gateway uses LoRa to send data several kilometers to the main control room.",
+            "timestamp": 480,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t9",
+            "speaker": "Interviewer",
+            "text": "What vitals are you monitoring?",
+            "timestamp": 540,
+            "status": "Approved"
+          },
+          {
+            "id": "t10",
+            "speaker": "Prashant",
+            "text": "Heart rate and skin temperature are basic. But more importantly, a 3-axis accelerometer for 'man-down' detection – if it detects a fall followed by no movement, it triggers an SOS. Also gas sensors for H2S or CO which are common killers in confined spaces.",
+            "timestamp": 600,
+            "status": "Approved",
+            "opportunity": true
+          },
+          {
+            "id": "t11",
+            "speaker": "Interviewer",
+            "text": "What are the wearable constraints?",
+            "timestamp": 660,
+            "status": "Approved"
+          },
+          {
+            "id": "t12",
+            "speaker": "Prashant",
+            "text": "Intrinsically safe – it cannot spark, or it becomes a hazard in explosive atmospheres. Needs ATEX or PESO certification. Rugged, waterproof, and a battery that lasts at least a 12-hour shift with UWB and Mesh active.",
+            "timestamp": 720,
+            "status": "Approved"
+          },
+          {
+            "id": "t13",
+            "speaker": "Interviewer",
+            "text": "What's the 'dream' UI for the rescue team?",
+            "timestamp": 780,
+            "status": "Approved"
+          },
+          {
+            "id": "t14",
+            "speaker": "Prashant",
+            "text": "A 3D floor plan showing every worker in real-time. If someone goes down, their icon turns flashing red and the map shows the fastest path to reach them. Seconds matter. That's the vision.",
+            "timestamp": 840,
+            "status": "Approved"
+          }
+        ]
+      }
+    ],
+    existing_product: "https://hixaa.com/products/",
+    complexity: "Very High",
+    skills_required: ["Embedded Systems", "Wireless Protocols", "Wearable Design", "Mobile App Development"],
+    tags: ["Worker Safety", "IoT", "UWB", "Confined Space", "Wearables", "Mesh Networking"],
+    prd: {
+      executive_summary: "Extend Raksha IoT platform with GPS-denied positioning and vitals mesh.",
+      success_metrics: {
+        primary_kpis: [
+{ metric: "Positioning Accuracy", target: "1-3m" },
+          { metric: "Response Time", baseline: "40 min", target: "<5 min" },
+        ],
+      },
 
       timeline_weeks: 12,
       budget_estimate: "₹10-15 Lakhs for pilot",
