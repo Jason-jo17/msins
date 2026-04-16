@@ -3,7 +3,7 @@
  * Dashboard, sprint, profile, marketplace, and MSME rows derive from this object.
  */
 
-const PDF = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+const PDF = "/Azhar - Nagpur NEXT - MSME Presentation Template.pptx.pdf";
 const THUMB = "/placeholder.svg";
 
 export const innovatorActiveChallenge = {
@@ -158,7 +158,7 @@ export const innovatorActiveChallenge = {
     ideaSubmission: {
       fileName: "Azhar - Nagpur NEXT - MSME Presentation Template.pptx.pdf",
       status: "Approved" as const,
-      pdfUrl: PDF,
+      pdfUrl: "/Azhar - Nagpur NEXT - MSME Presentation Template.pptx.pdf",
       previewThumbUrls: [
         "/src/assets/slides/slide_1.png",
         "/src/assets/slides/slide_2.png",

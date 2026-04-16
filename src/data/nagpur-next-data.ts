@@ -169,7 +169,7 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
       "Implement autonomous path planning",
     ],
     expected_outcome: "Efficient large-area nighttime SAR coverage.",
-    proposed_solution_pdf: "/solution-presentation.pdf",
+    proposed_solution_pdf: "/Azhar - Nagpur NEXT - MSME Presentation Template.pptx.pdf",
     complexity: "High",
     skills_required: ["Embedded Systems", "Optics", "Mechanical Design", "Drone Systems"],
     tags: ["Drones", "SAR", "Emergency Response", "Adaptive Optics", "UAV Payloads"],
