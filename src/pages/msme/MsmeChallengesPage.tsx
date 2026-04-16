@@ -3,12 +3,27 @@ import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { toast } from "sonner";
 import { 
+  Award,
+  Briefcase,
   Check, 
   ChevronDown, 
+  Clock,
+  ExternalLink,
+  FileCode2,
   FileText, 
+  Lock,
+  MapPin,
   MessageSquare, 
+  MoreHorizontal, 
   Presentation,
-  Lock
+  Rocket,
+  Search,
+  Settings,
+  ShieldCheck,
+  Target, 
+  Trophy,
+  Users as UsersIcon,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

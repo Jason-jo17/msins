@@ -26,7 +26,7 @@ import InnovatorProblemsBrowsePage from "./pages/innovator/InnovatorProblemsBrow
 import InnovatorProblemDetailPage from "./pages/innovator/InnovatorProblemDetailPage";
 import InnovatorSprintPage from "./pages/innovator/InnovatorSprintPage";
 import InnovatorMarketplacePage from "./pages/innovator/InnovatorMarketplacePage";
-import InnovatorProfilePage from "./pages/innovator/InnovatorProfilePage";
+import InnovatorProfilePage from "@/pages/innovator/InnovatorProfilePage";
 import { CohortRoleLayout } from "./pages/cohort/CohortRoleLayout";
 import CohortManagerDashboard from "./pages/cohort/CohortManagerDashboard";
 import CohortProgramBuilderPage from "./pages/cohort/CohortProgramBuilderPage";
