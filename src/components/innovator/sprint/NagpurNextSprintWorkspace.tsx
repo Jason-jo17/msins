@@ -28,6 +28,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
@@ -60,6 +61,13 @@ import {
   getNagpurNextActiveProject,
   getNagpurNextExecutionPhasesForInnovator,
   getNagpurNextSprintHeaderSnapshot,
+  nagpurNextMentorReviewAction,
+  nagpurNextRecordInnovatorSubmission,
+  nagpurNextSetPhaseUnlock,
+  nagpurNextSetActiveProject,
+  getNagpurNextTeamAssets,
+} from "@/lib/nagpur-next-cohort-store";
+import {
   innovatorActiveChallenge,
   nagpurNextCohortRank,
   nagpurNextDeliverableVault,
@@ -68,8 +76,6 @@ import {
   nagpurNextIndustryVisit,
   nagpurNextMentorFeedbackBullets,
   nagpurNextMilestones,
-  nagpurNextRecordInnovatorSubmission,
-  nagpurNextSetActiveProject,
   nagpurNextSpecification,
   nagpurNextSprintChallengeBrief,
   nagpurNextSprintInnovatorProblemId,
@@ -77,6 +83,9 @@ import {
   type NagpurTaskStatus,
 } from "@/data/innovator-nagpur-next-sprint";
 import { useNagpurNextCohortStoreVersion } from "@/hooks/use-nagpur-next-cohort-store";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 
 /** Same drone + Navitas copy everywhere these dialogs open (single `innovatorActiveChallenge`). */
 function SharedChallengeIdentityBlock() {
@@ -101,7 +110,7 @@ function statusBadgeClass(status: NagpurTaskStatus) {
     return "bg-emerald-500/12 text-emerald-800 border-emerald-500/25 dark:text-emerald-200";
   if (status === "under_review" || status === "submitted")
     return "bg-amber-500/12 text-amber-900 border-amber-500/30 dark:text-amber-100";
-  if (status === "rework_needed") return "bg-rose-500/12 text-rose-900 border-rose-500/30 dark:text-rose-100";
+  if (status === "rework_needed") return "bg-rose-500/15 text-rose-700 border-rose-500/40 font-bold dark:text-rose-200";
   if (status === "in_progress") return "bg-violet-500/12 text-violet-900 border-violet-500/28 dark:text-violet-100";
   if (status === "not_started") return "bg-muted text-muted-foreground border-border";
   return "bg-muted/70 text-muted-foreground border-border";
@@ -118,7 +127,7 @@ function statusLabel(task: NagpurSprintTask) {
   return "Locked";
 }
 
-export default function NagpurNextSprintWorkspace() {
+export default function NagpurNextSprintWorkspace({ isMentorView = false }: { isMentorView?: boolean }) {
   const cohortV = useNagpurNextCohortStoreVersion();
   const nagpurNextExecutionPhases = useMemo(() => getNagpurNextExecutionPhasesForInnovator(), [cohortV]);
   const nagpurNextSprintHeader = useMemo(() => getNagpurNextSprintHeaderSnapshot(), [cohortV]);
@@ -135,6 +144,24 @@ export default function NagpurNextSprintWorkspace() {
   const [visitDialogOpen, setVisitDialogOpen] = useState(false);
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [activeTask, setActiveTask] = useState<NagpurSprintTask | null>(null);
+  const [rubricScores, setRubricScores] = useState<Record<string, number>>({
+    fidelity: 8,
+    alignment: 7,
+    docs: 9,
+    innovation: 8
+  });
+  const [manualPhaseUnlock, setManualPhaseUnlock] = useState(false);
+
+  const teamId = "mt-kiran";
+  const teamAssets = useMemo(() => getNagpurNextTeamAssets(teamId), [teamId, cohortV]);
+
+  const avgTeamScore = useMemo(() => {
+    const scores = nagpurNextExecutionPhases.flatMap(p => p.sprints).flatMap(s => s.tasks)
+      .map(t => t.rubricScores ? Object.values(t.rubricScores) : [])
+      .flat();
+    if (scores.length === 0) return null;
+    return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+  }, [nagpurNextExecutionPhases]);
 
   const openTask = (task: NagpurSprintTask) => {
     setActiveTask(task);
@@ -369,10 +396,18 @@ export default function NagpurNextSprintWorkspace() {
                         <Target className="mr-1.5 h-3.5 w-3.5" />
                         View challenge
                       </Button>
-                      <Button size="sm" className="h-9 flex-1 bg-gradient-to-r from-violet-600 to-blue-600 shadow-sm sm:flex-none" onClick={() => uploadInputRef.current?.click()}>
-                        <Upload className="mr-1.5 h-3.5 w-3.5" />
-                        Upload submission
-                      </Button>
+                      {!isMentorView && (
+                        <Button size="sm" className="h-9 flex-1 bg-gradient-to-r from-violet-600 to-blue-600 shadow-sm sm:flex-none" onClick={() => uploadInputRef.current?.click()}>
+                          <Upload className="mr-1.5 h-3.5 w-3.5" />
+                          Upload submission
+                        </Button>
+                      )}
+                      {isMentorView && (
+                         <Button size="sm" variant="secondary" className="h-9 flex-1 border-primary/20 sm:flex-none" onClick={() => setChallengeOpen(true)}>
+                          <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                          Evaluation Mode
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -435,223 +470,314 @@ export default function NagpurNextSprintWorkspace() {
             {/* Main grid 70/30 */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-10 lg:items-start">
               <div className="space-y-4 lg:col-span-7">
-                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <Layers className="h-4 w-4 text-violet-600" />
-                  Execution flow
-                </div>
-                <Accordion type="multiple" defaultValue={phaseDefaultOpen} className="space-y-3">
-                  {nagpurNextExecutionPhases.map((phase) => (
-                    <AccordionItem
-                      key={phase.id}
-                      value={phase.id}
-                      className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm transition-all data-[state=open]:shadow-md"
-                    >
-                      <AccordionTrigger className="px-4 py-3 text-left hover:no-underline md:px-5 [&[data-state=open]>svg]:rotate-180">
-                        <div className="flex flex-1 flex-col gap-1 pr-2 text-left sm:flex-row sm:items-center sm:justify-between">
-                          <span className="text-sm font-semibold">
-                            Phase {phase.index}: {phase.title}
-                          </span>
-                          {phase.sprints.length === 0 ? (
-                            <span className="text-xs text-muted-foreground">{phase.collapsedSprintLabels.length} sprints</span>
-                          ) : null}
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="border-t border-border/60 bg-secondary/10 px-3 pb-4 pt-2 md:px-4">
-                        {phase.sprints.length === 0 ? (
-                          <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-                            {phase.collapsedSprintLabels.map((label) => (
-                              <li key={label} className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-3 py-2">
-                                <Sparkles className="h-3.5 w-3.5 shrink-0 text-violet-500" />
-                                {label}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <div className="space-y-2">
-                            {phase.sprints.map((sprint) => (
-                              <Collapsible key={sprint.id} defaultOpen={sprint.defaultOpen && !sprint.locked}>
-                                <div
-                                  className={cn(
-                                    "rounded-xl border border-border/80 bg-card shadow-sm",
-                                    sprint.locked && "opacity-70",
-                                  )}
-                                >
-                                  <CollapsibleTrigger
-                                    disabled={sprint.locked}
-                                    className={cn(
-                                      "group flex w-full items-center justify-between gap-2 px-3 py-3 text-left transition-colors hover:bg-muted/40 md:px-4",
-                                      sprint.locked && "cursor-not-allowed hover:bg-transparent",
-                                    )}
-                                  >
-                                    <div className="min-w-0">
-                                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Sprint</p>
-                                      <p className="truncate text-sm font-semibold text-foreground">{sprint.name}</p>
-                                      {sprint.locked ? (
-                                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                                          <Lock className="h-3 w-3" />
-                                          {sprint.lockHint}
-                                        </p>
-                                      ) : null}
-                                    </div>
-                                    {!sprint.locked ? (
-                                      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                                    ) : (
-                                      <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
-                                    )}
-                                  </CollapsibleTrigger>
-                                  <CollapsibleContent>
-                                    {sprint.evidenceNote ? (
-                                      <p className="border-t border-border/60 bg-muted/30 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground md:px-4">
-                                        {sprint.evidenceNote}
-                                      </p>
-                                    ) : null}
-                                    {sprint.tasks.length > 0 ? (
-                                      <div className="space-y-2 border-t border-border/60 p-3 md:p-4">
-                                        {sprint.tasks.map((task) => (
-                                          <button
-                                            key={task.id}
-                                            type="button"
-                                            onClick={() => openTask(task)}
-                                            className={cn(
-                                              "w-full rounded-xl border border-border/80 bg-background/80 p-3 text-left shadow-sm transition-all hover:border-violet-500/35 hover:shadow-md md:p-4",
-                                              task.status === "locked" && "pointer-events-auto opacity-55 hover:border-border/80 hover:shadow-sm",
-                                            )}
-                                          >
-                                            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                              <div className="min-w-0 space-y-1">
-                                                <p className="font-semibold text-foreground">{task.name}</p>
-                                                <p className="text-xs text-muted-foreground">{task.subtitle}</p>
-                                                <div className="flex flex-wrap items-center gap-2 pt-1">
-                                                  <Badge variant="outline" className={cn("text-[10px]", statusBadgeClass(task.status))}>
-                                                    {statusLabel(task)}
-                                                  </Badge>
-                                                  {task.sprintGate ? (
-                                                    <Badge variant="outline" className="border-violet-500/30 bg-violet-500/10 text-[10px] text-violet-800 dark:text-violet-200">
-                                                      Sprint gate
-                                                    </Badge>
-                                                  ) : null}
-                                                  {typeof task.progressPct === "number" ? (
-                                                    <span className="text-[11px] text-muted-foreground">Progress {task.progressPct}%</span>
-                                                  ) : null}
-                                                  {task.submitted ? (
-                                                    <span className="inline-flex items-center gap-0.5 text-[11px] text-emerald-700 dark:text-emerald-300">
-                                                      <CheckCircle2 className="h-3 w-3" />
-                                                      Submitted
-                                                    </span>
-                                                  ) : null}
-                                                  {task.mentorReview ? (
-                                                    <span className="text-[11px] text-muted-foreground">
-                                                      Mentor: <span className="font-medium text-foreground">{task.mentorReview}</span>
-                                                    </span>
-                                                  ) : null}
-                                                </div>
-                                              </div>
-                                              <div className="flex shrink-0 flex-col items-end gap-2 sm:items-end">
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                  <Calendar className="h-3.5 w-3.5" />
-                                                  {task.dueDate}
-                                                </div>
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                  <User className="h-3.5 w-3.5" />
-                                                  {task.mentor}
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                  {task.status !== "locked" ? (
-                                                    <Paperclip className="h-4 w-4 text-muted-foreground" aria-hidden />
-                                                  ) : (
-                                                    <FileText className="h-4 w-4 text-muted-foreground/50" aria-hidden />
-                                                  )}
-                                                  <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    variant="secondary"
-                                                    className="h-8 text-xs"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      openTask(task);
-                                                    }}
-                                                  >
-                                                    Open task
-                                                  </Button>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </button>
-                                        ))}
+                <Tabs defaultValue="flow" className="w-full">
+                  <div className="flex items-center justify-between mb-2">
+                    <TabsList className="bg-muted/50 p-1">
+                      <TabsTrigger value="flow" className="text-xs data-[state=active]:bg-background">Execution Flow</TabsTrigger>
+                      {isMentorView && (
+                        <TabsTrigger value="assets" className="text-xs data-[state=active]:bg-background">Project Assets ({teamAssets.length})</TabsTrigger>
+                      )}
+                    </TabsList>
+                    
+                    {isMentorView && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase text-muted-foreground mr-1">Phase Unlock</span>
+                        <Switch 
+                          checked={manualPhaseUnlock} 
+                          onCheckedChange={setManualPhaseUnlock}
+                          className="scale-75"
+                        />
+                      </div>
+                    )}
+                  </div>
 
-                                        {/* Sprint Resources & SMEs */}
-                                        {((sprint.resources || []).length > 0 || (sprint.smeData || []).length > 0) && (
-                                          <div className="mt-4 grid gap-4 border-t border-border/40 pt-4 sm:grid-cols-2">
-                                            {/* Resources */}
-                                            {(sprint.resources || []).length > 0 && (
-                                              <div className="space-y-3">
-                                                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                                  <Layers className="h-3.5 w-3.5" />
-                                                  Sprint Resources
-                                                </div>
-                                                <div className="space-y-2">
-                                                  {(sprint.resources || []).map((res) => (
-                                                    <a
-                                                      key={res.id}
-                                                      href={res.url}
-                                                      target="_blank"
-                                                      rel="noreferrer"
-                                                      className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/50 p-2.5 transition-all hover:border-primary/30 hover:bg-primary/[0.02] group"
-                                                    >
-                                                      {res.kind === "video" ? (
-                                                        <Video className="h-4 w-4 text-rose-500" />
-                                                      ) : (
-                                                        <LinkIcon className="h-4 w-4 text-blue-500" />
+                  <TabsContent value="flow" className="mt-0 outline-none">
+                    <Accordion type="multiple" defaultValue={phaseDefaultOpen} className="space-y-3">
+                      {nagpurNextExecutionPhases.map((phase) => (
+                        <AccordionItem
+                          key={phase.id}
+                          value={phase.id}
+                          className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm transition-all data-[state=open]:shadow-md"
+                        >
+                          <AccordionTrigger className="px-4 py-3 text-left hover:no-underline md:px-5 [&[data-state=open]>svg]:rotate-180">
+                            <div className="flex flex-1 flex-col gap-1 pr-2 text-left sm:flex-row sm:items-center sm:justify-between">
+                              <span className="text-sm font-semibold">
+                                Phase {phase.index}: {phase.title}
+                              </span>
+                              {phase.sprints.length === 0 ? (
+                                <span className="text-xs text-muted-foreground">{phase.collapsedSprintLabels.length} sprints</span>
+                              ) : null}
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="border-t border-border/60 bg-secondary/10 px-3 pb-4 pt-2 md:px-4">
+                            {phase.sprints.length === 0 ? (
+                              <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                                {phase.collapsedSprintLabels.map((label) => (
+                                  <li key={label} className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-3 py-2">
+                                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-violet-500" />
+                                    {label}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="space-y-2">
+                                {phase.sprints.map((sprint) => (
+                                  <Collapsible key={sprint.id} defaultOpen={sprint.defaultOpen && !sprint.locked}>
+                                    <div
+                                      className={cn(
+                                        "rounded-xl border border-border/80 bg-card shadow-sm",
+                                        sprint.locked && "opacity-70",
+                                      )}
+                                    >
+                                      <CollapsibleTrigger
+                                        disabled={sprint.locked && !isMentorView}
+                                        className={cn(
+                                          "group flex w-full items-center justify-between gap-2 px-3 py-3 text-left transition-colors hover:bg-muted/40 md:px-4",
+                                          sprint.locked && !isMentorView && "cursor-not-allowed hover:bg-transparent",
+                                        )}
+                                      >
+                                        <div className="min-w-0 flex-1">
+                                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Sprint</p>
+                                          <p className="truncate text-sm font-semibold text-foreground">{sprint.name}</p>
+                                          {sprint.locked ? (
+                                            <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                                              <Lock className="h-3 w-3" />
+                                              {sprint.lockHint}
+                                            </p>
+                                          ) : null}
+                                        </div>
+                                        
+                                        {isMentorView && (
+                                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-slate-50/50 mr-2" onClick={(e) => e.stopPropagation()}>
+                                            <span className="text-[10px] uppercase font-bold text-muted-foreground mr-1">Sprint Unlock</span>
+                                            <Switch 
+                                              checked={!sprint.locked} 
+                                              onCheckedChange={(v) => nagpurNextSetPhaseUnlock(sprint.id, v)}
+                                              className="scale-75 data-[state=checked]:bg-emerald-500"
+                                            />
+                                          </div>
+                                        )}
+
+                                        {!sprint.locked ? (
+                                          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                                        ) : (
+                                          <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                        )}
+                                      </CollapsibleTrigger>
+                                      <CollapsibleContent>
+                                        {sprint.evidenceNote ? (
+                                          <p className="border-t border-border/60 bg-muted/30 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground md:px-4">
+                                            {sprint.evidenceNote}
+                                          </p>
+                                        ) : null}
+                                        {sprint.tasks.length > 0 ? (
+                                          <div className="space-y-2 border-t border-border/60 p-3 md:p-4">
+                                            {sprint.tasks.map((task) => (
+                                              <button
+                                                key={task.id}
+                                                type="button"
+                                                onClick={() => openTask(task)}
+                                                className={cn(
+                                                  "w-full rounded-xl border border-border/80 bg-background/80 p-3 text-left shadow-sm transition-all hover:border-violet-500/35 hover:shadow-md md:p-4",
+                                                  task.status === "rework_needed" && "border-rose-500/30 bg-rose-500/[0.03] ring-1 ring-rose-500/10",
+                                                  task.status === "locked" && "pointer-events-auto opacity-55 hover:border-border/80 hover:shadow-sm",
+                                                )}
+                                              >
+                                                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                                  <div className="min-w-0 space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                      <p className="font-semibold text-foreground">{task.name}</p>
+                                                      {task.status === "rework_needed" && (
+                                                        <span className="animate-pulse flex h-2 w-2 rounded-full bg-rose-600" title="Action required" />
                                                       )}
-                                                      <span className="flex-1 truncate text-xs font-semibold text-foreground group-hover:text-primary">
-                                                        {res.title}
-                                                      </span>
-                                                      <ExternalLink className="h-3 w-3 text-muted-foreground/30 group-hover:text-primary/40" />
-                                                    </a>
-                                                  ))}
-                                                </div>
-                                              </div>
-                                            )}
-
-                                            {/* SMEs */}
-                                            {(sprint.smeData || []).length > 0 && (
-                                              <div className="space-y-3">
-                                                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                                  <ShieldCheck className="h-3.5 w-3.5" />
-                                                  Assigned SMEs
-                                                </div>
-                                                <div className="space-y-2">
-                                                  {(sprint.smeData || []).map((sme) => (
-                                                    <div
-                                                      key={sme.id}
-                                                      className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/50 p-2.5"
-                                                    >
-                                                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                                                        {sme.name.charAt(0)}
-                                                      </div>
-                                                      <div className="min-w-0">
-                                                        <p className="truncate text-xs font-bold text-foreground">{sme.name}</p>
-                                                        <p className="truncate text-[10px] text-muted-foreground">{sme.role}</p>
-                                                      </div>
                                                     </div>
-                                                  ))}
+                                                    <p className="text-xs text-muted-foreground">{task.subtitle}</p>
+                                                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                                                      <div className="flex items-center gap-2">
+                                                        {task.rubricScores && (
+                                                          <Badge variant="outline" className="h-5 px-1.5 text-[10px] bg-emerald-500/5 text-emerald-700 border-emerald-500/20 gap-1">
+                                                            <Sparkles className="h-2.5 w-2.5" />
+                                                            {Object.values(task.rubricScores).reduce((a,b) => a+b, 0) / Object.values(task.rubricScores).length}
+                                                          </Badge>
+                                                        )}
+                                                        <Badge variant="outline" className={cn("h-5 px-1.5 text-[10px]", statusBadgeClass(task.status))}>
+                                                          {statusLabel(task)}
+                                                        </Badge>
+                                                      </div>
+                                                      {task.sprintGate ? (
+                                                        <Badge variant="outline" className="border-violet-500/30 bg-violet-500/10 text-[10px] text-violet-800 dark:text-violet-200">
+                                                          Sprint gate
+                                                        </Badge>
+                                                      ) : null}
+                                                      {typeof task.progressPct === "number" ? (
+                                                        <span className="text-[11px] text-muted-foreground">Progress {task.progressPct}%</span>
+                                                      ) : null}
+                                                      {task.submitted ? (
+                                                        <span className="inline-flex items-center gap-0.5 text-[11px] text-emerald-700 dark:text-emerald-300">
+                                                          <CheckCircle2 className="h-3 w-3" />
+                                                          Submitted
+                                                        </span>
+                                                      ) : null}
+                                                      {task.mentorReview ? (
+                                                        <span className="text-[11px] text-muted-foreground">
+                                                          Mentor: <span className="font-medium text-foreground">{task.mentorReview}</span>
+                                                        </span>
+                                                      ) : null}
+                                                    </div>
+                                                  </div>
+                                                  <div className="flex shrink-0 flex-col items-end gap-2 sm:items-end">
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                      <Calendar className="h-3.5 w-3.5" />
+                                                      {task.dueDate}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                      <User className="h-3.5 w-3.5" />
+                                                      {task.mentor}
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                      {task.status !== "locked" ? (
+                                                        <Paperclip className="h-4 w-4 text-muted-foreground" aria-hidden />
+                                                      ) : (
+                                                        <FileText className="h-4 w-4 text-muted-foreground/50" aria-hidden />
+                                                      )}
+                                                      <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="secondary"
+                                                        className="h-8 text-xs"
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          openTask(task);
+                                                        }}
+                                                      >
+                                                        Open task
+                                                      </Button>
+                                                    </div>
+                                                  </div>
                                                 </div>
+                                              </button>
+                                            ))}
+
+                                            {/* Sprint Resources & SMEs */}
+                                            {((sprint.resources || []).length > 0 || (sprint.smeData || []).length > 0) && (
+                                              <div className="mt-4 grid gap-4 border-t border-border/40 pt-4 sm:grid-cols-2">
+                                                {/* Resources */}
+                                                {(sprint.resources || []).length > 0 && (
+                                                  <div className="space-y-3">
+                                                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                                      <Layers className="h-3.5 w-3.5" />
+                                                      Sprint Resources
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                      {(sprint.resources || []).map((res) => (
+                                                        <a
+                                                          key={res.id}
+                                                          href={res.url}
+                                                          target="_blank"
+                                                          rel="noreferrer"
+                                                          className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/50 p-2.5 transition-all hover:border-primary/30 hover:bg-primary/[0.02] group"
+                                                        >
+                                                          {res.kind === "video" ? (
+                                                            <Video className="h-4 w-4 text-rose-500" />
+                                                          ) : (
+                                                            <LinkIcon className="h-4 w-4 text-blue-500" />
+                                                          )}
+                                                          <span className="flex-1 truncate text-xs font-semibold text-foreground group-hover:text-primary">
+                                                            {res.title}
+                                                          </span>
+                                                          <ExternalLink className="h-3 w-3 text-muted-foreground/30 group-hover:text-primary/40" />
+                                                        </a>
+                                                      ))}
+                                                    </div>
+                                                  </div>
+                                                )}
+
+                                                {/* SMEs */}
+                                                {(sprint.smeData || []).length > 0 && (
+                                                  <div className="space-y-3">
+                                                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                                      <ShieldCheck className="h-3.5 w-3.5" />
+                                                      Assigned SMEs
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                      {(sprint.smeData || []).map((sme) => (
+                                                        <div
+                                                          key={sme.id}
+                                                          className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/50 p-2.5"
+                                                        >
+                                                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                                                            {sme.name.charAt(0)}
+                                                          </div>
+                                                          <div className="min-w-0">
+                                                            <p className="truncate text-xs font-bold text-foreground">{sme.name}</p>
+                                                            <p className="truncate text-[10px] text-muted-foreground">{sme.role}</p>
+                                                          </div>
+                                                        </div>
+                                                      ))}
+                                                    </div>
+                                                  </div>
+                                                )}
                                               </div>
                                             )}
                                           </div>
-                                        )}
-                                      </div>
-                                    ) : null}
-                                  </CollapsibleContent>
+                                        ) : null}
+                                      </CollapsibleContent>
+                                    </div>
+                                  </Collapsible>
+                                ))}
+                              </div>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </TabsContent>
+
+                  <TabsContent value="assets" className="mt-0 outline-none">
+                    <Card className="rounded-2xl border-border/80 shadow-sm overflow-hidden">
+                      <CardHeader className="bg-muted/30 pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-sm font-bold">Team Deliverables Library</CardTitle>
+                          <Badge variant="secondary" className="text-[10px] font-mono">{teamAssets.length} Files</Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div className="divide-y divide-border/60">
+                          {teamAssets.length > 0 ? (
+                            teamAssets.map((asset) => (
+                              <div key={asset.id} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600">
+                                    <FileText className="h-4 w-4" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-bold text-foreground truncate">{asset.title}</p>
+                                    <p className="text-[10px] text-muted-foreground uppercase">{asset.kind} · Shared with {innovatorActiveChallenge.mentor.name}</p>
+                                  </div>
                                 </div>
-                              </Collapsible>
-                            ))}
-                          </div>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                                <div className="flex items-center gap-2">
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" asChild>
+                                    <a href={asset.url} target="_blank" rel="noreferrer">
+                                      <ExternalLink className="h-3.5 w-3.5" />
+                                    </a>
+                                  </Button>
+                                  <Button size="sm" variant="secondary" className="h-8 text-[10px] px-3 font-semibold" asChild>
+                                    <a href={asset.url} target="_blank" rel="noreferrer">View File</a>
+                                  </Button>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-12 text-center">
+                              <Layers className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
+                              <p className="text-xs text-muted-foreground">No assets uploaded yet by the team.</p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               </div>
 
               <div id="nagpur-feedback-panel" className="space-y-4 lg:col-span-3">
@@ -716,7 +842,7 @@ export default function NagpurNextSprintWorkspace() {
 
                 <Card className="rounded-2xl border-border/80 shadow-sm">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-semibold">Mentor feedback</CardTitle>
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{isMentorView ? "Mentoring guidance" : "Mentor feedback"}</p>
                     <p className="text-xs text-muted-foreground">{innovatorActiveChallenge.mentor.name}</p>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -727,17 +853,29 @@ export default function NagpurNextSprintWorkspace() {
                         </li>
                       ))}
                     </ol>
-                    <Button
-                      className="w-full bg-gradient-to-r from-violet-600 to-blue-600 shadow-sm"
-                      size="sm"
-                      onClick={() =>
-                        toast.success("Call scheduled", {
-                          description: `${innovatorActiveChallenge.mentor.name} · ${innovatorActiveChallenge.project.nextReview} (demo).`,
-                        })
-                      }
-                    >
-                      Book review call
-                    </Button>
+                    {!isMentorView && (
+                      <Button
+                        className="w-full bg-gradient-to-r from-violet-600 to-blue-600 shadow-sm"
+                        size="sm"
+                        onClick={() =>
+                          toast.success("Call scheduled", {
+                            description: `${innovatorActiveChallenge.mentor.name} · ${innovatorActiveChallenge.project.nextReview} (demo).`,
+                          })
+                        }
+                      >
+                        Book review call
+                      </Button>
+                    )}
+                    {isMentorView && (
+                      <Button
+                        variant="outline"
+                        className="w-full border-primary/20 text-primary"
+                        size="sm"
+                        onClick={() => toast.success("Draft shared", { description: "Instruction draft saved." })}
+                      >
+                        Update cohort guidance
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -798,9 +936,14 @@ export default function NagpurNextSprintWorkspace() {
                       </span>
                     </p>
                     <Separator />
-                    <div className="flex justify-between gap-2">
-                      <span className="text-muted-foreground">Attendance</span>
-                      <span className="font-semibold">{nagpurNextCohortRank.attendancePct}%</span>
+                    <div className="flex items-center gap-2">
+                      <LayoutList className="h-4 w-4 text-primary" />
+                      <span className="font-bold tracking-tight">{innovatorActiveChallenge.project.projectName}</span>
+                      {isMentorView && avgTeamScore && (
+                        <Badge variant="secondary" className="ml-2 bg-indigo-500/10 text-indigo-700 border-indigo-500/20">
+                          Avg Score: {avgTeamScore}/10
+                        </Badge>
+                      )}
                     </div>
                     <div className="flex justify-between gap-2">
                       <span className="text-muted-foreground">Submission consistency</span>
@@ -1026,11 +1169,6 @@ export default function NagpurNextSprintWorkspace() {
                   Mentor: <span className="font-medium text-foreground">{activeTask.mentor}</span>
                 </span>
               </div>
-              {activeTask.mentorReview ? (
-                <p className="rounded-lg border border-border bg-background/80 px-3 py-2 text-xs text-muted-foreground">
-                  Gate status: <span className="font-medium text-foreground">{activeTask.mentorReview}</span>
-                </p>
-              ) : null}
               {typeof activeTask.progressPct === "number" ? (
                 <div>
                   <div className="mb-1 flex justify-between text-[11px] text-muted-foreground">
@@ -1040,9 +1178,10 @@ export default function NagpurNextSprintWorkspace() {
                   <Progress value={activeTask.progressPct} className="h-2" />
                 </div>
               ) : null}
+
               {activeTask.mentorComments && activeTask.mentorComments.length > 0 ? (
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Mentor comments</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Previous feedback</p>
                   <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
                     {activeTask.mentorComments.map((c) => (
                       <li key={c} className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2">
@@ -1052,13 +1191,14 @@ export default function NagpurNextSprintWorkspace() {
                   </ul>
                 </div>
               ) : null}
+
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">PDF preview</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Submission Preview</p>
                 <div className="mt-2 overflow-hidden rounded-lg border border-border bg-muted/40">
                   <iframe title="PDF preview" src={taskPreviewPdfUrl} className="h-[200px] w-full" />
                 </div>
-                <p className="mt-1 text-[10px] text-muted-foreground">Opens sample PDF; replace URL in shared data for production.</p>
               </div>
+
               {activeTask.evidence && activeTask.evidence.length > 0 ? (
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Submitted files</p>
@@ -1080,26 +1220,125 @@ export default function NagpurNextSprintWorkspace() {
                   </div>
                 </div>
               ) : null}
+
+              {isMentorView && (
+                <div className="mt-6 space-y-6 pt-6 border-t border-border/60">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-indigo-500/[0.08] rounded-lg border border-indigo-500/20">
+                    <ShieldCheck className="h-4 w-4 text-indigo-600" />
+                    <span className="text-xs font-bold uppercase tracking-tight text-indigo-700">Review & Evaluate</span>
+                  </div>
+
+                  <div className="space-y-5 px-1">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-[11px] font-bold uppercase text-muted-foreground mr-1">Prototype Fidelity</Label>
+                        <span className="text-xs font-mono font-bold text-primary">{rubricScores.fidelity}/10</span>
+                      </div>
+                      <Slider 
+                        value={[rubricScores.fidelity]} 
+                        max={10} 
+                        step={1} 
+                        onValueChange={([v]) => setRubricScores(prev => ({ ...prev, fidelity: v }))} 
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-[11px] font-bold uppercase text-muted-foreground mr-1">Industry Alignment</Label>
+                        <span className="text-xs font-mono font-bold text-primary">{rubricScores.alignment}/10</span>
+                      </div>
+                      <Slider 
+                        value={[rubricScores.alignment]} 
+                        max={10} 
+                        step={1} 
+                        onValueChange={([v]) => setRubricScores(prev => ({ ...prev, alignment: v }))} 
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-[11px] font-bold uppercase text-muted-foreground mr-1">Documentation Quality</Label>
+                        <span className="text-xs font-mono font-bold text-primary">{rubricScores.docs}/10</span>
+                      </div>
+                      <Slider 
+                        value={[rubricScores.docs]} 
+                        max={10} 
+                        step={1} 
+                        onValueChange={([v]) => setRubricScores(prev => ({ ...prev, docs: v }))} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold uppercase text-muted-foreground">Internal Review Note</Label>
+                    <textarea 
+                      className="w-full min-h-[80px] rounded-lg border border-border bg-background p-3 text-xs focus:ring-1 focus:ring-primary outline-none transition-all"
+                      placeholder="Add specific guidance for the team..."
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           ) : null}
           <SheetFooter className="mt-6 flex-col gap-2 sm:flex-col">
-            <Button
-              className="w-full bg-gradient-to-r from-violet-600 to-blue-600"
-              onClick={() => toast.success("Revision submitted", { description: "Mentor notified (demo flow)." })}
-            >
-              Resubmit
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                const first = activeTask?.evidence?.[0];
-                if (first) window.open(first.url, "_blank", "noopener,noreferrer");
-                else window.open(taskPreviewPdfUrl, "_blank", "noopener,noreferrer");
-              }}
-            >
-              Open in new tab
-            </Button>
+            {!isMentorView ? (
+              <>
+                <Button
+                  className="w-full bg-gradient-to-r from-violet-600 to-blue-600"
+                  onClick={() => toast.success("Revision submitted", { description: "Mentor notified (demo flow)." })}
+                >
+                  Resubmit
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const first = activeTask?.evidence?.[0];
+                    if (first) window.open(first.url, "_blank", "noopener,noreferrer");
+                    else window.open(taskPreviewPdfUrl, "_blank", "noopener,noreferrer");
+                  }}
+                >
+                  Open in new tab
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-2 w-full">
+                  <Button
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 shadow-sm"
+                    onClick={() => {
+                      if (activeTask) {
+                        nagpurNextMentorReviewAction(activeTask.id, "approve", "Approved based on rubric evaluation.", rubricScores);
+                        toast.success("Task Approved", { description: `${activeTask.name} has been signed off.` });
+                        setTaskSheetOpen(false);
+                      }
+                    }}
+                  >
+                    Approve Task
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="w-full shadow-sm"
+                    onClick={() => {
+                      if (activeTask) {
+                        nagpurNextMentorReviewAction(activeTask.id, "request_changes", "Please address rubric gaps and resubmit.");
+                        toast.warning("Changes Requested", { description: "Team has been notified of rework needed." });
+                        setTaskSheetOpen(false);
+                      }
+                    }}
+                  >
+                    Request Rework
+                  </Button>
+                </div>
+                <Button
+                  variant="ghost"
+                  className="w-full text-xs text-muted-foreground"
+                  onClick={() => setTaskSheetOpen(false)}
+                >
+                  Close Review
+                </Button>
+              </>
+            )}
           </SheetFooter>
         </SheetContent>
       </Sheet>

@@ -33,6 +33,8 @@ import {
   mentorTeamRows,
   type MentorTeamRow,
 } from "@/data/mentor-workspace";
+import { useNagpurNextCohortStoreVersion } from "@/hooks/use-nagpur-next-cohort-store";
+import { getNagpurNextCohortState } from "@/lib/nagpur-next-cohort-store";
 import { useInnovatorSprintStore } from "@/hooks/use-innovator-sprint-store";
 
 const TAB_VALUES = ["teams", "reviews", "cohorts", "msme"] as const;
@@ -45,7 +47,7 @@ function riskBadge(r: "Low" | "Medium" | "High") {
 }
 
 function workspaceHref(row: MentorTeamRow) {
-  return "https://sip-lite-staging.web.app/projects";
+  return `/mentor/teams/${row.id}/workspace`;
 }
 
 export default function MentorTeamsPage() {
@@ -66,14 +68,24 @@ export default function MentorTeamsPage() {
 
   const focusId = searchParams.get("focus");
 
+  const cohortBatchV = useNagpurNextCohortStoreVersion();
+  const cohortState = useMemo(() => getNagpurNextCohortState(), [cohortBatchV]);
+
   const teamRowsLive = useMemo(() => {
-    const ev = sprintStore.projects["spr-msme-ev-cooling"];
-    if (!ev) return mentorTeamRows;
     return mentorTeamRows.map((row) => {
-      if (row.id !== "mt-3") return row;
-      return { ...row, progressPct: ev.overallProgressPct };
+      // Mock enrichment for Kiran/Nagpur NEXT team
+      if (row.id === "mt-kiran") {
+        const teamTasks = Object.values(cohortState.taskState);
+        const pending = teamTasks.filter(t => t.status === "under_review").length;
+        return { 
+          ...row, 
+          progressPct: Math.round((teamTasks.filter(t => t.status === "approved" || t.status === "completed").length / teamTasks.length) * 100),
+          pendingReviews: pending
+        };
+      }
+      return row;
     });
-  }, [sprintStore]);
+  }, [cohortState]);
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-12">
@@ -111,7 +123,7 @@ export default function MentorTeamsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      {["Team", "Members", "Domain", "Sprint", "Progress", "Risk", "Last active"].map((h) => (
+                      {["Team", "Type", "Members", "Domain", "Sprint", "Progress", "Risk", "Last active"].map((h) => (
                         <TableHead key={h} className="text-[11px] whitespace-nowrap">
                           {h}
                         </TableHead>
@@ -122,7 +134,32 @@ export default function MentorTeamsPage() {
                   <TableBody>
                     {teamRowsLive.map((row) => (
                       <TableRow key={row.id} className={cn(focusId === row.id && "bg-primary/[0.05]")}>
-                        <TableCell className="font-medium text-sm max-w-[200px]">{row.teamName}</TableCell>
+                        <TableCell className="font-medium text-sm max-w-[200px]">
+                          <div className="flex flex-col gap-1">
+                            {row.teamName}
+                             {(row as any).pendingReviews > 0 && (
+                               <div className="flex items-center gap-1.5 mt-0.5 group">
+                                 <Badge className="w-fit px-1.5 py-0.5 text-[9px] font-bold bg-amber-500 hover:bg-amber-600 text-white border-none animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                                   {(row as any).pendingReviews} ACTION REQUIRED
+                                 </Badge>
+                                 <span className="text-[10px] text-amber-600 font-medium">Review pending</span>
+                               </div>
+                             )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant="secondary" 
+                            className={cn(
+                              "text-[10px] font-bold tracking-tight",
+                              row.projectType === "Innovation" 
+                                ? "bg-indigo-500/10 text-indigo-600 border-indigo-500/20" 
+                                : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                            )}
+                          >
+                            {row.projectType}
+                          </Badge>
+                        </TableCell>
                         <TableCell className="text-sm">{row.members}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{row.domain}</TableCell>
                         <TableCell className="text-sm text-muted-foreground max-w-[200px]">{row.sprint}</TableCell>
@@ -140,8 +177,8 @@ export default function MentorTeamsPage() {
                         <TableCell className="text-xs font-mono text-muted-foreground">{row.lastActive}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex flex-wrap justify-end gap-1">
-                             <Button size="sm" variant="secondary" className="h-8 text-[10px] px-2" asChild>
-                              <a href={workspaceHref(row)} target="_blank" rel="noreferrer">Open Workspace</a>
+                             <Button size="sm" variant="secondary" className="h-8 text-[10px] px-2 shadow-sm border border-primary/10" asChild>
+                              <Link to={workspaceHref(row)}>Open Workspace</Link>
                             </Button>
                             <Button size="sm" variant="outline" className="h-8 text-[10px] px-2" onClick={() => setFeedbackTeam(row)}>
                               Send Feedback

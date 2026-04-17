@@ -90,9 +90,22 @@ export interface MentorTeamRow {
   risk: "Low" | "Medium" | "High";
   lastActive: string;
   cohortOrMsme: string;
+  projectType: "Academic" | "Innovation";
 }
 
 export const mentorTeamRows: MentorTeamRow[] = [
+  {
+    id: "mt-kiran",
+    teamName: "Navitas Lighting · Kiran",
+    members: "4",
+    domain: "Robotics / IoT",
+    sprint: "Intelligent Modular Drone System",
+    progressPct: 72,
+    risk: "Low",
+    lastActive: "Just now",
+    cohortOrMsme: "Navitas Lighting · Nagpur NEXT",
+    projectType: "Innovation",
+  },
   {
     id: "mt-1",
     teamName: "AgriBot Labs",
@@ -103,6 +116,7 @@ export const mentorTeamRows: MentorTeamRow[] = [
     risk: "Low",
     lastActive: "2h ago",
     cohortOrMsme: "Sahyadri Agro · Nashik Growth",
+    projectType: "Innovation",
   },
   {
     id: "mt-2",
@@ -114,6 +128,7 @@ export const mentorTeamRows: MentorTeamRow[] = [
     risk: "High",
     lastActive: "5h ago",
     cohortOrMsme: "Marathwada Textiles · Kolhapur Industrial",
+    projectType: "Innovation",
   },
   {
     id: "mt-3",
@@ -125,6 +140,7 @@ export const mentorTeamRows: MentorTeamRow[] = [
     risk: "Low",
     lastActive: "1d ago",
     cohortOrMsme: "GreenDrive Motors · Pune Pioneer",
+    projectType: "Academic",
   },
   {
     id: "mt-4",
@@ -136,6 +152,7 @@ export const mentorTeamRows: MentorTeamRow[] = [
     risk: "Medium",
     lastActive: "3h ago",
     cohortOrMsme: "Precision Auto · Pune Pioneer",
+    projectType: "Academic",
   },
   {
     id: "mt-5",
@@ -147,6 +164,7 @@ export const mentorTeamRows: MentorTeamRow[] = [
     risk: "Low",
     lastActive: "1d ago",
     cohortOrMsme: "Vidarbha Industrial · Nagpur Central",
+    projectType: "Innovation",
   },
   {
     id: "mt-6",
@@ -158,6 +176,7 @@ export const mentorTeamRows: MentorTeamRow[] = [
     risk: "High",
     lastActive: "6h ago",
     cohortOrMsme: "Sahyadri Agro · Nashik Growth",
+    projectType: "Innovation",
   },
 ];
 

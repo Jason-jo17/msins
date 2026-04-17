@@ -14,6 +14,7 @@ export {
   getNagpurNextTeamsAttention,
   nagpurNextMentorReviewAction,
   nagpurNextRecordInnovatorSubmission,
+  nagpurNextSetPhaseUnlock,
   nagpurNextReassignMentor,
   nagpurNextSetLevels,
   nagpurNextSetTaskDueDate,
@@ -22,4 +23,5 @@ export {
   nagpurNextUpdateTask,
   nagpurNextSetActiveProject,
   getNagpurNextActiveProject,
+  getNagpurNextTeamAssets,
 } from "@/lib/nagpur-next-cohort-store";

@@ -22,11 +22,12 @@ import type {
 } from "@/data/innovator-active-challenge";
 import { mentorProfile } from "@/data/mentor-workspace";
 
-const LS_KEY = "maharashtra-nagpur-next-cohort-v1";
+// Constants moved here with defensive null-safety to prevent top-level module initialization crashes
 const PDF = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+const M_MSME = (typeof innovatorActiveChallenge !== 'undefined' && innovatorActiveChallenge?.msme?.poc) ? innovatorActiveChallenge.msme.poc : "POC";
+const M_COHORT = (typeof mentorProfile !== 'undefined' && mentorProfile?.shortName) ? mentorProfile.shortName : "Mentor";
+const LS_KEY = "maharashtra-nagpur-next-cohort-v2";
 
-const M_MSME = innovatorActiveChallenge.msme.poc;
-const M_COHORT = mentorProfile.shortName;
 
 export type NagpurCohortTaskStatus = InnovatorTaskStatus;
 
@@ -77,6 +78,8 @@ export interface TaskRuntime {
   evidence: InnovatorEvidenceItem[];
   /** Mentor/admin hard lock */
   taskLocked: boolean;
+  /** New: Mentor-assigned rubric scores */
+  rubricScores?: Record<string, number>;
 }
 
 export interface NagpurCohortStoreState {
@@ -94,6 +97,8 @@ export interface NagpurCohortStoreState {
   avgMentorResponseHours: number;
   demoReadinessPct: number;
   activeProjectId: string;
+  /** New: Manual phase overrides by mentor */
+  manualPhaseUnlocks: Record<string, boolean>;
 }
 
 type Listener = () => void;
@@ -130,44 +135,82 @@ function buildDefaultTaskState(framework: NagpurProgramPhaseTemplate[]): Record<
 function initialState(): NagpurCohortStoreState {
   const programFramework = JSON.parse(JSON.stringify(NAGPUR_NEXT_PHASES));
   const taskState = buildDefaultTaskState(programFramework);
-  const done = (id: string, due: string, mentor?: string, evidenceTitle?: string) => {
-    taskState[id] = {
-      ...taskState[id],
-      status: "completed",
-      dueDate: due,
-      mentor: mentor ?? taskState[id].mentor,
+  
+  const state: NagpurCohortStoreState = {
+    version: 2,
+    programId: NAGPUR_NEXT_PROGRAM_ID,
+    cycleLabel: NAGPUR_NEXT_CYCLE_LABEL,
+    programFramework,
+    levels: { ...innovatorActiveChallenge.levels },
+    taskState,
+    activity: [],
+    upcomingReviews: [],
+    teamsMeta: {
+      [NAGPUR_NEXT_INNOVATOR_TEAM_ID]: { atRisk: false },
+      "team-aurora": { atRisk: true, riskReason: "Vendor slip on LED reels — milestone at risk" },
+      "team-agrisense": { atRisk: false },
+    },
+    avgMentorResponseHours: 6.5,
+    demoReadinessPct: 61,
+    activeProjectId: "project-drone",
+    manualPhaseUnlocks: {},
+  };
+
+  const done = (taskId: string, date: string, mnter: string, file?: string, rubric?: Record<string, number>) => {
+    state.taskState[taskId] = {
+      ...state.taskState[taskId],
+      status: "approved",
+      dueDate: date,
+      mentor: mnter,
+      mentorComments: ["Approved based on review cycle."],
       submitted: true,
       mentorReview: "Approved",
-      mentorComments: ["Meets Nagpur NEXT gate — keep evidence trail updated."],
-      evidence: evidenceTitle
-        ? [{ id: `${id}-ev`, title: evidenceTitle, url: PDF, kind: "pdf" }]
-        : [],
+      evidence: file ? [{ id: `f-${taskId}`, title: file, url: PDF, kind: "doc" }] : [],
       taskLocked: false,
+      rubricScores: rubric,
     };
   };
 
   // Phase 1–2 + sprint 5 complete
-  done("nn-t-s1-1", "12 Apr 2026", M_MSME, "Industry_Scan_Nagpur.pdf");
-  done("nn-t-s1-2", "14 Apr 2026", M_COHORT, "Competitor_Study_Lighting.pdf");
-  done("nn-t-s1-3", "16 Apr 2026", M_MSME, "User_Pain_SAR_Operators.pdf");
-  done("nn-t-s1-4", "18 Apr 2026", M_COHORT, "Problem_Frame_HMW.pdf");
-  done("nn-t-s2-1", "20 Apr 2026", M_MSME, "Stakeholder_Interviews.pdf");
-  done("nn-t-s2-2", "21 Apr 2026", M_MSME, "Field_Visit_Navitas.pdf");
-  done("nn-t-s2-3", "22 Apr 2026", M_COHORT, "Operator_Survey_Chart.pdf");
-  done("nn-t-s2-4", "24 Apr 2026", M_COHORT, "Insight_Synthesis_Memo.pdf");
-  done("nn-t-s3-1", "26 Apr 2026", M_COHORT, "Fishbone_Night_Coverage.pdf");
-  done("nn-t-s3-2", "27 Apr 2026", M_COHORT, "Five_Why_Pack.pdf");
-  done("nn-t-s3-3", "28 Apr 2026", M_MSME, "Opportunity_Areas_Map.pdf");
-  done("nn-t-s4-1", "30 Apr 2026", M_COHORT, "Idea_Generation_Board.pdf");
-  done("nn-t-s4-2", "2 May 2026", M_MSME, "Concept_Scoring_Sheet.pdf");
-  done("nn-t-s4-3", "4 May 2026", M_MSME, "Feasibility_Matrix.pdf");
-  done("nn-t-s5-1", "8 May 2026", M_MSME, "BOM_Draft_Navitas.pdf");
-  done("nn-t-s5-2", "10 May 2026", M_COHORT, "CAD_Architecture_Pack.pdf");
-  done("nn-t-s5-3", "12 May 2026", M_MSME, "Resource_Plan.pdf");
+  done("nn-t-s1-1", "12 Apr 2026", M_MSME, "Industry_Scan_Nagpur.pdf", { fidelity: 9, alignment: 8, docs: 10 });
+  done("nn-t-s1-2", "14 Apr 2026", M_COHORT, "Competitor_Study_Lighting.pdf", { fidelity: 8, alignment: 7, docs: 9 });
+  done("nn-t-s1-3", "16 Apr 2026", M_MSME, "User_Pain_SAR_Operators.pdf", { fidelity: 9, alignment: 9, docs: 8 });
+  done("nn-t-s1-4", "18 Apr 2026", M_COHORT, "Problem_Frame_HMW.pdf", { fidelity: 10, alignment: 9, docs: 9 });
+  done("nn-t-s2-1", "20 Apr 2026", M_MSME, "Stakeholder_Interviews.pdf", { fidelity: 9, alignment: 8, docs: 8 });
+  done("nn-t-s2-2", "21 Apr 2026", M_MSME, "Field_Visit_Navitas.pdf", { fidelity: 8, alignment: 9, docs: 7 });
+  done("nn-t-s2-3", "22 Apr 2026", M_COHORT, "Operator_Survey_Chart.pdf", { fidelity: 7, alignment: 8, docs: 9 });
+  done("nn-t-s2-4", "24 Apr 2026", M_COHORT, "Insight_Synthesis_Memo.pdf", { fidelity: 9, alignment: 9, docs: 9 });
+  done("nn-t-s3-1", "26 Apr 2026", M_COHORT, "Fishbone_Night_Coverage.pdf", { fidelity: 8, alignment: 7, docs: 8 });
+  done("nn-t-s3-2", "27 Apr 2026", M_COHORT, "Five_Why_Pack.pdf", { fidelity: 9, alignment: 8, docs: 10 });
+  done("nn-t-s3-3", "28 Apr 2026", M_MSME, "Opportunity_Areas_Map.pdf", { fidelity: 10, alignment: 9, docs: 8 });
+  done("nn-t-s4-1", "30 Apr 2026", M_COHORT, "Idea_Generation_Board.pdf", { fidelity: 9, alignment: 9, docs: 9 });
+  done("nn-t-s4-2", "2 May 2026", M_MSME, "Concept_Scoring_Sheet.pdf", { fidelity: 8, alignment: 8, docs: 8 });
+  done("nn-t-s4-3", "4 May 2026", M_MSME, "Feasibility_Matrix.pdf", { fidelity: 9, alignment: 10, docs: 9 });
+
+  // Currently Under Review (Sprint 5)
+  state.taskState["nn-t-s5-1"] = {
+    ...state.taskState["nn-t-s5-1"],
+    status: "under_review",
+    dueDate: "8 May 2026",
+    mentor: M_MSME,
+    submitted: true,
+    mentorReview: "Pending Review",
+    evidence: [{ id: "ev-s5-1", title: "BOM_Draft_Navitas.pdf", url: PDF, kind: "pdf" }],
+    taskLocked: false,
+  };
+  
+  state.taskState["nn-t-s5-2"] = {
+    ...state.taskState["nn-t-s5-2"],
+    status: "not_started",
+    dueDate: "10 May 2026",
+    mentor: M_COHORT,
+    submitted: false,
+    taskLocked: true, // Auto-locked because S5-1 is under review
+  };
 
   // Sprint 6 — active
-  taskState["nn-t-s6-1"] = {
-    ...taskState["nn-t-s6-1"],
+  state.taskState["nn-t-s6-1"] = {
+    ...state.taskState["nn-t-s6-1"],
     status: "under_review",
     dueDate: "18 May 2026",
     mentor: M_MSME,
@@ -269,7 +312,7 @@ function initialState(): NagpurCohortStoreState {
   ];
 
   return {
-    version: 1,
+    version: 2,
     programId: NAGPUR_NEXT_PROGRAM_ID,
     cycleLabel: NAGPUR_NEXT_CYCLE_LABEL,
     programFramework,
@@ -285,6 +328,7 @@ function initialState(): NagpurCohortStoreState {
     avgMentorResponseHours: 6.5,
     demoReadinessPct: 61,
     activeProjectId: "project-drone",
+    manualPhaseUnlocks: {},
   };
 }
 
@@ -293,18 +337,36 @@ function loadOrCreate(): NagpurCohortStoreState {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return initialState();
     const parsed = JSON.parse(raw) as NagpurCohortStoreState;
-    if (parsed?.version !== 1 || !parsed.taskState) return initialState();
+    if (!parsed || parsed.version !== 2 || !parsed.taskState || !parsed.manualPhaseUnlocks) {
+      console.log("[NagpurCohortStore] State version mismatch or missing critical fields, resetting.");
+      return initialState();
+    }
     return parsed;
-  } catch {
+  } catch (err) {
+    console.warn("[NagpurCohortStore] Failed to load state from LS, using initial:", err);
     return initialState();
   }
 }
 
-let state: NagpurCohortStoreState = loadOrCreate();
+// Global safety state - lazy initialized
+let state: NagpurCohortStoreState | null = null;
+
+function ensureState(): NagpurCohortStoreState {
+  if (!state) {
+    try {
+      state = loadOrCreate();
+    } catch (e) {
+      console.error("[NagpurCohortStore] CRITICAL CRASH in state initialization:", e);
+      state = initialState();
+    }
+  }
+  return state;
+}
 
 function persist() {
+  const s = ensureState();
   try {
-    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    localStorage.setItem(LS_KEY, JSON.stringify(s));
   } catch {
     /* ignore */
   }
@@ -326,7 +388,7 @@ export function getNagpurNextCohortStoreVersion() {
 }
 
 export function getNagpurNextCohortState(): NagpurCohortStoreState {
-  return state;
+  return ensureState();
 }
 
 export function resetNagpurNextCohortDemo() {
@@ -348,19 +410,24 @@ function isTerminal(s: NagpurCohortTaskStatus): boolean {
 }
 
 function sprintComplete(sprintId: string): boolean {
-  const sprint = state.programFramework.flatMap((p) => p.sprints).find((s) => s.id === sprintId);
+  const s = ensureState();
+  const sprint = s.programFramework.flatMap((p) => p.sprints).find((s) => s.id === sprintId);
   if (!sprint) return false;
   return sprint.tasks.every((t) => {
-    const st = state.taskState[t.id]?.status ?? "not_started";
+    const st = s.taskState[t.id]?.status ?? "not_started";
     return isTerminal(st);
   });
 }
 
 function sprintGloballyLocked(sprintId: string): boolean {
+  const s = ensureState();
+  if (s?.manualPhaseUnlocks?.[sprintId]) return false;
   const ord = getSprintOrderIndex(sprintId);
   if (ord <= 0) return false;
-  const flat = state.programFramework.flatMap((p) => p.sprints);
+  const flat = s?.programFramework?.flatMap((p) => p.sprints) || [];
+  if (ord > flat.length) return false;
   const prev = flat[ord - 1];
+  if (!prev) return false;
   return !sprintComplete(prev.id);
 }
 
@@ -457,13 +524,15 @@ export function getNagpurNextSprintHeaderSnapshot() {
 
 /** Set active project ID for innovator context */
 export function nagpurNextSetActiveProject(projectId: string) {
-  state.activeProjectId = projectId;
+  const s = ensureState();
+  s.activeProjectId = projectId;
   emit();
 }
 
 /** Get active project context from innovator challenge */
 export function getNagpurNextActiveProject() {
-  const pId = state.activeProjectId || "project-drone";
+  const s = ensureState();
+  const pId = s.activeProjectId || "project-drone";
   return innovatorActiveChallenge.projects.find((p) => p.id === pId) || innovatorActiveChallenge.projects[0];
 }
 
@@ -482,26 +551,28 @@ export function getNagpurNextProjectSnapshot() {
 }
 
 function computeOverallProgressPct(): number {
+  const s = ensureState();
   let sum = 0;
-  const taskIds = state.programFramework.flatMap(p => p.sprints).flatMap(s => s.tasks).map(t => t.id);
+  const taskIds = s.programFramework.flatMap(p => p.sprints).flatMap(s => s.tasks).map(t => t.id);
   for (const id of taskIds) {
-    const s = state.taskState[id]?.status ?? "not_started";
-    sum += taskWeight(s);
+    const st = s.taskState[id]?.status ?? "not_started";
+    sum += taskWeight(st);
   }
   if (taskIds.length === 0) return 0;
   return Math.min(100, Math.round((sum / taskIds.length) * 100));
 }
 
 export function getNagpurNextLaneProgress() {
+  const s = ensureState();
   return NAGPUR_NEXT_EXECUTION_LANES.map((lane) => {
-    const taskIds = state.programFramework.flatMap((p) =>
-      p.sprints.filter((s) => (lane.sprintIds as readonly string[]).includes(s.id)).flatMap((s) => s.tasks.map((t) => t.id)),
+    const taskIds = s.programFramework.flatMap((p) =>
+      p.sprints.filter((sp) => (lane.sprintIds as readonly string[]).includes(sp.id)).flatMap((sp) => sp.tasks.map((t) => t.id)),
     );
     const pct =
       taskIds.length === 0
         ? 0
         : Math.round(
-            (taskIds.reduce((a, id) => a + taskWeight(state.taskState[id]?.status ?? "not_started"), 0) / taskIds.length) *
+            (taskIds.reduce((a, id) => a + taskWeight(s.taskState[id]?.status ?? "not_started"), 0) / taskIds.length) *
               100,
           );
     return { id: lane.id, label: lane.label, completionPct: Math.min(100, pct) };
@@ -509,12 +580,13 @@ export function getNagpurNextLaneProgress() {
 }
 
 export function getNagpurNextCohortKpis() {
-  const tasks = Object.values(state.taskState);
+  const s = ensureState();
+  const tasks = Object.values(s.taskState);
   const pendingReview = tasks.filter((t) => t.status === "under_review").length;
   const approved = tasks.filter((t) => t.mentorReview === "Approved" || t.status === "approved" || t.status === "completed").length;
   const totalInnovators = 24;
   const activeTeams = 18;
-  const atRiskTeams = Object.values(state.teamsMeta).filter((m) => m.atRisk).length;
+  const atRiskTeams = Object.values(s.teamsMeta).filter((m) => m.atRisk).length;
   const sprintCompletion = computeOverallProgressPct();
 
   return [
@@ -524,12 +596,13 @@ export function getNagpurNextCohortKpis() {
     { id: "sc", label: "Sprint completion", value: `${sprintCompletion}%` },
     { id: "rk", label: "At-risk teams", value: String(atRiskTeams) },
     { id: "ap", label: "Approved submissions", value: String(approved) },
-    { id: "rt", label: "Avg mentor response", value: `${state.avgMentorResponseHours}h` },
-    { id: "dr", label: "Demo readiness", value: `${state.demoReadinessPct}%` },
+    { id: "rt", label: "Avg mentor response", value: `${s.avgMentorResponseHours}h` },
+    { id: "dr", label: "Demo readiness", value: `${s.demoReadinessPct}%` },
   ] as const;
 }
 
 export function getNagpurNextTeamsAttention(): NagpurTeamCard[] {
+  const s = ensureState();
   return [
     {
       id: NAGPUR_NEXT_INNOVATOR_TEAM_ID,
@@ -538,8 +611,8 @@ export function getNagpurNextTeamsAttention(): NagpurTeamCard[] {
       college: "VNIT Nagpur",
       currentSprintLabel: "Sprint 6: MVP Build",
       currentPhaseTitle: "Prototype Development",
-      atRisk: state.teamsMeta[NAGPUR_NEXT_INNOVATOR_TEAM_ID]?.atRisk ?? false,
-      riskReason: state.teamsMeta[NAGPUR_NEXT_INNOVATOR_TEAM_ID]?.riskReason,
+      atRisk: s.teamsMeta[NAGPUR_NEXT_INNOVATOR_TEAM_ID]?.atRisk ?? false,
+      riskReason: s.teamsMeta[NAGPUR_NEXT_INNOVATOR_TEAM_ID]?.riskReason,
       progressPct: computeOverallProgressPct(),
       domain: innovatorActiveChallenge.msme.domain,
     },
@@ -551,7 +624,7 @@ export function getNagpurNextTeamsAttention(): NagpurTeamCard[] {
       currentSprintLabel: "Sprint 5: Prototype Planning",
       currentPhaseTitle: "Prototype Development",
       atRisk: true,
-      riskReason: state.teamsMeta["team-aurora"]?.riskReason,
+      riskReason: s.teamsMeta["team-aurora"]?.riskReason,
       progressPct: 54,
       domain: "Energy",
     },
@@ -567,6 +640,14 @@ export function getNagpurNextTeamsAttention(): NagpurTeamCard[] {
       domain: "Agri-tech",
     },
   ];
+}
+
+export function getNagpurNextTeamAssets(teamId: string) {
+  const s = ensureState();
+  // Since this is a demo linked to local store, we just return all evidence across all tasks
+  return Object.values(s.taskState)
+    .flatMap((t) => t.evidence)
+    .filter(Boolean);
 }
 
 export function getNagpurNextTeamDetail(teamId: string) {
@@ -593,10 +674,11 @@ export function getNagpurNextTeamDetail(teamId: string) {
     };
   }
 
-  const taskIds = state.programFramework.flatMap(p => p.sprints).flatMap(s => s.tasks).map(t => t.id);
+  const s = ensureState();
+  const taskIds = s.programFramework.flatMap(p => p.sprints).flatMap(s => s.tasks).map(t => t.id);
   const tasksPreview = taskIds.map((id) => {
-    const tmpl = state.programFramework.flatMap((p) => p.sprints).flatMap((s) => s.tasks).find((t) => t.id === id)!;
-    return { id, name: tmpl.name, status: state.taskState[id]?.status ?? "not_started" };
+    const tmpl = s.programFramework.flatMap((p) => p.sprints).flatMap((sp) => sp.tasks).find((t) => t.id === id)!;
+    return { id, name: tmpl.name, status: s.taskState[id]?.status ?? "not_started" };
   });
 
   return {
@@ -612,9 +694,9 @@ export function getNagpurNextTeamDetail(teamId: string) {
     project: {
       problemStatement: ac.problemStatement,
       msme: ac.msme.company,
-      trl: state.levels.trl,
-      crl: state.levels.crl,
-      irl: state.levels.irl,
+      trl: s.levels.trl,
+      crl: s.levels.crl,
+      irl: s.levels.irl,
       phase: "Phase 3: Prototype Development",
       sprint: "Sprint 6: MVP Build",
     },
@@ -625,8 +707,9 @@ export function getNagpurNextTeamDetail(teamId: string) {
 }
 
 function pushActivity(item: Omit<CohortActivityItem, "id">) {
+  const s = ensureState();
   const id = `act-${Date.now()}`;
-  state = { ...state, activity: [{ id, ...item }, ...state.activity].slice(0, 40) };
+  state = { ...s, activity: [{ id, ...item }, ...s.activity].slice(0, 40) };
   emit();
 }
 
@@ -634,7 +717,8 @@ export function nagpurNextUpdateTask(
   taskId: string,
   patch: Partial<TaskRuntime> & { status?: NagpurCohortTaskStatus },
 ) {
-  const cur = state.taskState[taskId];
+  const s = ensureState();
+  const cur = s.taskState[taskId];
   if (!cur) return;
   const next: TaskRuntime = { ...cur, ...patch };
   if (patch.status === "approved" || patch.status === "completed") {
@@ -644,7 +728,7 @@ export function nagpurNextUpdateTask(
   if (patch.status === "rework_needed") {
     next.mentorReview = "Pending Review";
   }
-  state = { ...state, taskState: { ...state.taskState, [taskId]: next } };
+  state = { ...s, taskState: { ...s.taskState, [taskId]: next } };
   emit();
 }
 
@@ -652,14 +736,17 @@ export function nagpurNextMentorReviewAction(
   taskId: string,
   action: "approve" | "request_changes" | "comment",
   comment?: string,
+  rubricScores?: Record<string, number>
 ) {
-  const cur = state.taskState[taskId];
+  const s = ensureState();
+  const cur = s.taskState[taskId];
   if (!cur) return;
   if (action === "approve") {
     nagpurNextUpdateTask(taskId, {
       status: "completed",
       mentorReview: "Approved",
       mentorComments: [...cur.mentorComments, comment ?? "Approved for Nagpur NEXT gate."],
+      rubricScores: rubricScores || cur.rubricScores,
     });
     pushActivity({
       kind: "approval",
@@ -673,6 +760,7 @@ export function nagpurNextMentorReviewAction(
       status: "rework_needed",
       mentorReview: "Pending Review",
       mentorComments: [...cur.mentorComments, comment ?? "Changes requested — see comments."],
+      rubricScores: rubricScores || cur.rubricScores,
     });
     pushActivity({
       kind: "feedback",
@@ -695,8 +783,25 @@ export function nagpurNextMentorReviewAction(
   }
 }
 
+export function nagpurNextSetPhaseUnlock(sprintId: string, unlocked: boolean) {
+  const s = ensureState();
+  state = {
+    ...s,
+    manualPhaseUnlocks: { ...s.manualPhaseUnlocks, [sprintId]: unlocked }
+  };
+  emit();
+  pushActivity({
+    kind: "sprint_unlock",
+    label: unlocked ? "Sprint unlocked" : "Sprint locked",
+    detail: `${sprintId} status updated by mentor`,
+    atLabel: "Just now",
+    teamId: NAGPUR_NEXT_INNOVATOR_TEAM_ID,
+  });
+}
+
 export function nagpurNextToggleTaskLock(taskId: string) {
-  const cur = state.taskState[taskId];
+  const s = ensureState();
+  const cur = s.taskState[taskId];
   if (!cur) return;
   nagpurNextUpdateTask(taskId, { taskLocked: !cur.taskLocked });
 }
@@ -710,21 +815,24 @@ export function nagpurNextReassignMentor(taskId: string, mentor: string) {
 }
 
 export function nagpurNextSetTeamAtRisk(teamId: string, atRisk: boolean, riskReason?: string) {
+  const s = ensureState();
   state = {
-    ...state,
-    teamsMeta: { ...state.teamsMeta, [teamId]: { atRisk, riskReason } },
+    ...s,
+    teamsMeta: { ...s.teamsMeta, [teamId]: { atRisk, riskReason } },
   };
   emit();
 }
 
 export function nagpurNextSetLevels(levels: { trl: number; crl: number; irl: number }) {
-  state = { ...state, levels: { ...levels } };
+  const s = ensureState();
+  state = { ...s, levels: { ...levels } };
   emit();
 }
 
 /** Innovator-side: record upload (demo) — keeps activity feed aligned */
 export function nagpurNextRecordInnovatorSubmission(taskId: string, fileName: string) {
-  const cur = state.taskState[taskId];
+  const s = ensureState();
+  const cur = s.taskState[taskId];
   if (!cur) return;
   nagpurNextUpdateTask(taskId, {
     submitted: true,
@@ -743,52 +851,56 @@ export function nagpurNextRecordInnovatorSubmission(taskId: string, fileName: st
 // PROGRAM MANAGEMENT ACTIONS
 
 export function nagpurNextUpdateSprint(sprintId: string, patch: Partial<NagpurProgramSprintTemplate>) {
+  const s = ensureState();
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => s.id === sprintId ? { ...s, ...patch } : s)
+      sprints: phase.sprints.map(sp => sp.id === sprintId ? { ...sp, ...patch } : sp)
     }))
   };
   emit();
 }
 
 export function nagpurNextAddSprintResource(sprintId: string, resource: Omit<NagpurProgramResource, "id">) {
+  const s = ensureState();
   const id = `res-${Date.now()}`;
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => s.id === sprintId ? { ...s, resources: [...(s.resources || []), { ...resource, id } as NagpurProgramResource] } : s)
+      sprints: phase.sprints.map(sp => sp.id === sprintId ? { ...sp, resources: [...(sp.resources || []), { ...resource, id } as NagpurProgramResource] } : sp)
     }))
   };
   emit();
 }
 
 export function nagpurNextRemoveSprintResource(sprintId: string, resourceId: string) {
+  const s = ensureState();
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => s.id === sprintId ? { ...s, resources: (s.resources || []).filter(r => r.id !== resourceId) } : s)
+      sprints: phase.sprints.map(sp => sp.id === sprintId ? { ...sp, resources: (sp.resources || []).filter(r => r.id !== resourceId) } : sp)
     }))
   };
   emit();
 }
 
 export function nagpurNextAddTaskTemplate(sprintId: string, task: Omit<NagpurProgramTaskTemplate, "id">) {
+  const s = ensureState();
   const id = `task-new-${Date.now()}`;
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => {
-        if (s.id !== sprintId) return s;
-        return { ...s, tasks: [...s.tasks, { ...task, id } as NagpurProgramTaskTemplate] };
+      sprints: phase.sprints.map(sp => {
+        if (sp.id !== sprintId) return sp;
+        return { ...sp, tasks: [...sp.tasks, { ...task, id } as NagpurProgramTaskTemplate] };
       })
     })),
     taskState: {
-      ...state.taskState,
+      ...s.taskState,
       [id]: {
         status: "not_started",
         dueDate: "Jun 2026",
@@ -804,16 +916,17 @@ export function nagpurNextAddTaskTemplate(sprintId: string, task: Omit<NagpurPro
 }
 
 export function nagpurNextDeleteTaskTemplate(sprintId: string, taskId: string) {
-  const newTaskState = { ...state.taskState };
+  const s = ensureState();
+  const newTaskState = { ...s.taskState };
   delete newTaskState[taskId];
 
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => {
-        if (s.id !== sprintId) return s;
-        return { ...s, tasks: s.tasks.filter(t => t.id !== taskId) };
+      sprints: phase.sprints.map(sp => {
+        if (sp.id !== sprintId) return sp;
+        return { ...sp, tasks: sp.tasks.filter(t => t.id !== taskId) };
       })
     })),
     taskState: newTaskState
@@ -822,15 +935,16 @@ export function nagpurNextDeleteTaskTemplate(sprintId: string, taskId: string) {
 }
 
 export function nagpurNextUpdateTaskTemplate(sprintId: string, taskId: string, updates: Partial<NagpurProgramTaskTemplate>) {
+  const s = ensureState();
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => {
-        if (s.id !== sprintId) return s;
+      sprints: phase.sprints.map(sp => {
+        if (sp.id !== sprintId) return sp;
         return {
-          ...s,
-          tasks: s.tasks.map(t => t.id === taskId ? { ...t, ...updates } : t)
+          ...sp,
+          tasks: sp.tasks.map(t => t.id === taskId ? { ...t, ...updates } : t)
         };
       })
     }))
@@ -843,15 +957,16 @@ export function nagpurNextUpdateSmeSection(sprintId: string, smeData: NagpurProg
 }
 
 export function nagpurNextAddTaskResource(sprintId: string, taskId: string, resource: NagpurProgramResource) {
+  const s = ensureState();
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => {
-        if (s.id !== sprintId) return s;
+      sprints: phase.sprints.map(sp => {
+        if (sp.id !== sprintId) return sp;
         return {
-          ...s,
-          tasks: s.tasks.map(t => {
+          ...sp,
+          tasks: sp.tasks.map(t => {
             if (t.id !== taskId) return t;
             return {
               ...t,
@@ -866,15 +981,16 @@ export function nagpurNextAddTaskResource(sprintId: string, taskId: string, reso
 }
 
 export function nagpurNextRemoveTaskResource(sprintId: string, taskId: string, resourceId: string) {
+  const s = ensureState();
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => {
-        if (s.id !== sprintId) return s;
+      sprints: phase.sprints.map(sp => {
+        if (sp.id !== sprintId) return sp;
         return {
-          ...s,
-          tasks: s.tasks.map(t => {
+          ...sp,
+          tasks: sp.tasks.map(t => {
             if (t.id !== taskId) return t;
             return {
               ...t,
@@ -889,15 +1005,16 @@ export function nagpurNextRemoveTaskResource(sprintId: string, taskId: string, r
 }
 
 export function nagpurNextUpdateTaskSmeSection(sprintId: string, taskId: string, smeData: NagpurProgramSme[]) {
+  const s = ensureState();
   state = {
-    ...state,
-    programFramework: state.programFramework.map(phase => ({
+    ...s,
+    programFramework: s.programFramework.map(phase => ({
       ...phase,
-      sprints: phase.sprints.map(s => {
-        if (s.id !== sprintId) return s;
+      sprints: phase.sprints.map(sp => {
+        if (sp.id !== sprintId) return sp;
         return {
-          ...s,
-          tasks: s.tasks.map(t => t.id === taskId ? { ...t, smeData } : t)
+          ...sp,
+          tasks: sp.tasks.map(t => t.id === taskId ? { ...t, smeData } : t)
         };
       })
     }))
