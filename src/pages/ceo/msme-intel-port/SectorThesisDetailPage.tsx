@@ -7,15 +7,22 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Target, CheckCircle2, Shield, AlertTriangle, Zap, Download } from 'lucide-react';
 import { MH_SECTORS_DATA } from '@/lib/data/msme-sectors-data';
-import AerospaceSectorThesisView from './AerospaceSectorThesisView';
+import DetailedSectorThesisView from './DetailedSectorThesisView';
+import { AEROSPACE_SECTOR_THESIS } from '@/lib/data/aerospace-sector-thesis';
+import { PORT_SECTOR_THESIS } from '@/lib/data/port-sector-thesis';
+
+const THESIS_MAP: Record<string, any> = {
+    'aerospace': AEROSPACE_SECTOR_THESIS,
+    'port-logistics': PORT_SECTOR_THESIS,
+};
 
 export default function SectorThesisDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     
-    // GUARD: If this is the newly digitized Aerospace sector, return the highly specific 7-tab component
-    if (id === 'aerospace') {
-        return <AerospaceSectorThesisView />;
+    // GUARD: If this is a newly digitized sector, return the highly specific 7-tab component
+    if (id && THESIS_MAP[id]) {
+        return <DetailedSectorThesisView thesis={THESIS_MAP[id]} />;
     }
 
     // Find matching sector by code (Legacy path)

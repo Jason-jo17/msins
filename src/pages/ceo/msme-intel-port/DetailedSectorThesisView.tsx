@@ -6,36 +6,40 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Target, CheckCircle2, Download, Zap, Microscope, TrendingUp, Building2, AlertTriangle, Scale, BookOpen, Link as LinkIcon, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { AEROSPACE_SECTOR_THESIS } from '@/lib/data/aerospace-sector-thesis';
+import { DetailedSectorThesis } from '@/types/msme-sector-registry';
 
 // Mock Automation Hub Data since it wasn't strictly provided in JSON
 const MOCK_AUTOMATION_HUB = [
     {
-        title: "Predictive Maintenance (MRO)",
+        title: "Predictive Maintenance (AI)",
         domain: "Operations Integration",
         impact: "High",
         roi: "35% Cost Reduction",
-        description: "AI-driven sensors tracking aircraft fatigue in real-time to prevent unplanned groundings."
+        description: "AI-driven sensors tracking asset fatigue in real-time to prevent unplanned downtime."
     },
     {
-        title: "Automated Non-Destructive Testing (NDT)",
+        title: "Automated Quality Inspection",
         domain: "Quality Assurance",
         impact: "Critical",
         roi: "60% Time Saved",
-        description: "Computer vision mapping micro-fractures in composite aero-structures."
+        description: "Computer vision mapping micro-fractures and defects in critical infrastructure."
     },
     {
-        title: "Generative Design for Lightweighting",
+        title: "Generative Design Optimization",
         domain: "R&D",
         impact: "Medium",
         roi: "15% Weight Reduction",
-        description: "Algorithmic generation of optimal bracket designs minimizing material usage while maintaining strength."
+        description: "Algorithmic generation of optimal designs minimizing material usage while maintaining strength."
     }
 ];
 
-export default function AerospaceSectorThesisView() {
+interface DetailedSectorThesisViewProps {
+    thesis: DetailedSectorThesis;
+}
+
+export default function DetailedSectorThesisView({ thesis }: DetailedSectorThesisViewProps) {
     const navigate = useNavigate();
-    const sector = AEROSPACE_SECTOR_THESIS;
+    const sector = thesis;
 
     const handleBack = () => {
         const basePath = window.location.pathname.startsWith('/ceo') ? '/ceo/thesis' : '/msme/thesis';
@@ -135,7 +139,7 @@ export default function AerospaceSectorThesisView() {
                         </CardHeader>
                         <CardContent className="pt-6">
                             <ul className="space-y-4">
-                                {sector.key_findings.map((finding, i) => (
+                                {sector.key_findings?.map((finding, i) => (
                                     <li key={i} className="flex items-start gap-3">
                                         <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
                                         <span className="text-xs font-semibold text-foreground/90">{finding}</span>
@@ -162,7 +166,7 @@ export default function AerospaceSectorThesisView() {
                         {/* Tab 1: Sub-Sectors */}
                         <TabsContent value="subsectors" className="p-6 m-0 focus-visible:outline-none">
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                {sector.sub_sectors.map((sub, i) => (
+                                {sector.sub_sectors?.map((sub, i) => (
                                     <Card key={i} className="shadow-sm border-border hover:shadow-md transition-all">
                                         <CardHeader className="bg-muted/10 border-b border-border pb-3">
                                             <div className="flex justify-between items-start">
@@ -179,7 +183,7 @@ export default function AerospaceSectorThesisView() {
                                             <div>
                                                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block">Top Players</span>
                                                 <div className="flex flex-wrap gap-1.5">
-                                                    {sub.key_players.map((kp, j) => (
+                                                    {sub.key_players?.map((kp, j) => (
                                                         <Badge key={j} variant="secondary" className="text-[10px]">{kp}</Badge>
                                                     ))}
                                                 </div>
@@ -193,7 +197,7 @@ export default function AerospaceSectorThesisView() {
                         {/* Tab 2: Growth Drivers */}
                         <TabsContent value="drivers" className="p-6 m-0 focus-visible:outline-none">
                             <div className="grid gap-6 md:grid-cols-2">
-                                {sector.growth_drivers.map((driver, i) => (
+                                {sector.growth_drivers?.map((driver, i) => (
                                     <Card key={i} className="shadow-sm border-border relative overflow-hidden group hover:border-primary/50 transition-colors">
                                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                             <TrendingUp className="h-32 w-32 text-primary" />
@@ -226,7 +230,7 @@ export default function AerospaceSectorThesisView() {
                         {/* Tab 3: Opportunities */}
                         <TabsContent value="opportunities" className="p-6 m-0 focus-visible:outline-none">
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-                                {sector.opportunities.map((opp, i) => (
+                                {sector.opportunities?.map((opp, i) => (
                                     <Card key={i} className="border-emerald-200 bg-emerald-50/30 shadow-sm relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-4 opacity-5">
                                             <Target className="h-40 w-40 text-emerald-600" />
@@ -307,7 +311,7 @@ export default function AerospaceSectorThesisView() {
                                     <Briefcase className="h-5 w-5 text-primary" /> Competitive Landscape
                                 </h3>
                                 <div className="grid gap-4 md:grid-cols-2">
-                                    {sector.competitors.map((comp, i) => (
+                                    {sector.competitors?.map((comp, i) => (
                                         <Card key={i} className="shadow-sm border-border">
                                             <CardHeader className="pb-2 bg-muted/10 border-b border-border/50">
                                                 <div className="flex justify-between items-center">
@@ -327,7 +331,7 @@ export default function AerospaceSectorThesisView() {
                                                 <div className="col-span-2 space-y-2 mt-2">
                                                     <div className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Key Strengths</div>
                                                     <div className="flex flex-wrap gap-1.5">
-                                                        {comp.key_strengths.map((str, j) => (
+                                                        {comp.key_strengths?.map((str, j) => (
                                                             <Badge key={j} variant="secondary" className="bg-muted text-foreground/80 hover:bg-muted font-semibold text-[10px]">
                                                                 {str}
                                                             </Badge>
@@ -347,7 +351,7 @@ export default function AerospaceSectorThesisView() {
                                     <Zap className="h-5 w-5 text-primary" /> Featured Emerging Leaders
                                 </h3>
                                 <div className="grid gap-4 md:grid-cols-3">
-                                    {sector.emerging_companies.map((co, i) => (
+                                    {sector.emerging_companies?.map((co, i) => (
                                         <div key={i} className="p-4 border border-border rounded-xl bg-card hover:border-primary/50 transition-colors cursor-pointer group">
                                             <div className="flex items-center gap-3 mb-2">
                                                 <div className="h-8 w-8 rounded bg-primary/10 text-primary flex items-center justify-center font-black">
@@ -373,7 +377,7 @@ export default function AerospaceSectorThesisView() {
                                         <BookOpen className="h-5 w-5 text-primary" /> Key Policies
                                     </h3>
                                     <div className="space-y-4">
-                                        {sector.policies.map((pol, i) => (
+                                        {sector.policies?.map((pol, i) => (
                                             <div key={i} className="p-4 border border-border rounded-xl bg-muted/5 relative overflow-hidden">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div>
@@ -394,7 +398,7 @@ export default function AerospaceSectorThesisView() {
                                         <AlertTriangle className="h-5 w-5 text-destructive" /> Risk Factors
                                     </h3>
                                     <div className="space-y-4">
-                                        {sector.risks.map((risk, i) => (
+                                        {sector.risks?.map((risk, i) => (
                                             <div key={i} className="p-4 border border-destructive/20 rounded-xl bg-destructive/5 relative overflow-hidden">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <h4 className="font-bold text-md text-destructive">{risk.name}</h4>
@@ -404,7 +408,7 @@ export default function AerospaceSectorThesisView() {
                                                 <div className="mt-4 pt-4 border-t border-destructive/10">
                                                     <span className="text-[10px] uppercase font-bold tracking-widest text-destructive/70 mb-2 block">Actionable Mitigations</span>
                                                     <ul className="list-disc pl-4 space-y-1">
-                                                        {risk.mitigation.map((mit, j) => (
+                                                        {risk.mitigation?.map((mit, j) => (
                                                             <li key={j} className="text-xs font-semibold text-destructive/90">{mit}</li>
                                                         ))}
                                                     </ul>
@@ -419,7 +423,7 @@ export default function AerospaceSectorThesisView() {
                         {/* Tab 7: Sources */}
                         <TabsContent value="references" className="p-6 m-0 focus-visible:outline-none">
                             <div className="space-y-4">
-                                {sector.citations.map((cit, i) => (
+                                {sector.citations?.map((cit, i) => (
                                     <div key={i} className="p-4 border border-border rounded-xl hover:bg-muted/30 transition-colors flex flex-col md:flex-row gap-4 justify-between items-start">
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2">
@@ -433,7 +437,7 @@ export default function AerospaceSectorThesisView() {
                                             </div>
                                             <p className="text-xs italic border-l-2 border-primary/30 pl-2 mt-2">"{cit.excerpt}"</p>
                                             <div className="flex flex-wrap gap-1.5 mt-3">
-                                                {cit.tags.map((tag, j) => (
+                                                {cit.tags?.map((tag, j) => (
                                                     <span key={j} className="text-[9px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground uppercase tracking-widest">
                                                         #{tag}
                                                     </span>

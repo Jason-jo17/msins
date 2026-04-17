@@ -1,4 +1,4 @@
-import { DetailedSectorThesis } from "@/types/msme-sector-registry";
+import { DetailedSectorThesis } from "../../types/msme-sector-registry";
 
 export const PORT_SECTOR_THESIS: DetailedSectorThesis = {
   id: "port-logistics",
@@ -85,14 +85,16 @@ export const PORT_SECTOR_THESIS: DetailedSectorThesis = {
       type: "supply_side",
       impact_level: "high",
       description: "Deepening of drafts to handle larger vessels.",
-      estimated_impact_percentage: 25
+      estimated_impact_percentage: 25,
+      citation_ids: ["mng1"]
     },
     {
       name: "MRPL Petchem Expansion",
       type: "demand_side",
       impact_level: "high",
       description: "Increased demand for specialized chemical logistics.",
-      estimated_impact_percentage: 40
+      estimated_impact_percentage: 40,
+      citation_ids: ["mng1"]
     }
   ],
   opportunities: [
@@ -121,7 +123,8 @@ export const PORT_SECTOR_THESIS: DetailedSectorThesis = {
       type: "supply_side",
       description: "Multimodal connectivity for port-hinterland flow.",
       impact: "High",
-      status: "active"
+      status: "active",
+      citation_ids: ["mng1"]
     }
   ],
   risks: [
@@ -130,11 +133,24 @@ export const PORT_SECTOR_THESIS: DetailedSectorThesis = {
       category: "market",
       severity: "medium",
       probability: 0.3,
-      description: "Silting issues during monsoons affecting larger vessels."
+      description: "Silting issues during monsoons affecting larger vessels.",
+      mitigation: [
+        "Annual maintenance dredging",
+        "Tide-based vessel scheduling",
+        "Breakwater enhancement"
+      ],
+      citation_ids: ["mng1"]
     }
   ],
   competitors: [],
   market_stats_history: [],
+  emerging_companies: [
+    {
+      id: "shiprocket-mng",
+      name: "SmartPort IoT",
+      description: "Local startup providing container tracking sensors."
+    }
+  ],
   citations: [
     {
       id: "mng1",
