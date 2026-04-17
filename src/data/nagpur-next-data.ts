@@ -1659,7 +1659,7 @@ export const NAGPUR_NEXT_CHALLENGES: NagpurNextChallenge[] = [
         ]
       }
     ],
-    complexity: "High",
+
     prd: {
       executive_summary: "Develop an indigenous digital caliper with Bluetooth connectivity for real-time data transfer.",
       success_metrics: {
